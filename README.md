@@ -34,3 +34,61 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+```
+playerwavehub
+├─ app
+│  ├─ favicon.ico
+│  ├─ globals.css
+│  ├─ layout.tsx
+│  ├─ page.tsx
+│  ├─ people
+│  └─ players
+│     └─ page.tsx
+├─ components
+│  ├─ players
+│  │  └─ PlayerForm.tsx
+│  └─ Sidebar.tsx
+├─ eslint.config.mjs
+├─ lib
+│  ├─ actions
+│  │  └─ players.ts
+│  ├─ auth.ts
+│  ├─ db
+│  │  └─ players.ts
+│  ├─ login
+│  │  └─ page.tsx
+│  ├─ supabase
+│  │  ├─ admin.ts
+│  │  └─ server.ts
+│  └─ validation
+│     └─ player.ts
+├─ next.config.ts
+├─ package-lock.json
+├─ package.json
+├─ postcss.config.mjs
+├─ proxy.ts
+├─ public
+│  ├─ file.svg
+│  ├─ globe.svg
+│  ├─ next.svg
+│  ├─ vercel.svg
+│  └─ window.svg
+├─ README.md
+├─ supabase
+│  ├─ .temp
+│  │  ├─ cli-latest
+│  │  ├─ gotrue-version
+│  │  ├─ linked-project.json
+│  │  ├─ pooler-url
+│  │  ├─ postgres-version
+│  │  ├─ project-ref
+│  │  ├─ rest-version
+│  │  ├─ storage-migration
+│  │  └─ storage-version
+│  ├─ config.toml
+│  └─ migrations
+│     └─ 20261017165713_init.sql
+└─ tsconfig.json
+
+```
