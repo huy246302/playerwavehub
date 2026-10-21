@@ -25,7 +25,7 @@ export async function insertPerson(
   for (let i = 0; i < 3; i++) {
     const slug = i === 0 ? base : `${base}-${Math.random().toString(36).slice(2, 6)}`;
     const { data, error } = await sb
-      .from("people")
+      .from("biographies")
       .insert({
         slug,
         full_name: input.full_name,

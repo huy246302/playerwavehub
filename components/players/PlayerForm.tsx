@@ -4,9 +4,9 @@ import { useRouter } from "next/navigation";
 import { createPlayer, updatePlayer, type FormState } from "@/lib/actions/players";
 
 type Props = {
-  people: { id: number; full_name: string }[];
+  biographies: { id: number; full_name: string }[];
   player?: {
-    id: number; person_id: number; person: { full_name: string } | null;
+    id: number; biography_id: number; person: { full_name: string } | null;
     career_start_year: number | null; retired_year: number | null;
     height_cm: number | null; legacy_summary: string | null; is_published: boolean;
   } | null;
@@ -15,7 +15,7 @@ type Props = {
 const input =
   "w-full rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm outline-none focus:border-[#254a39] focus:ring-2 focus:ring-[#254a39]/15";
 
-export default function PlayerForm({ people, player }: Props) {
+export default function PlayerForm({ biographies, player }: Props) {
   const router = useRouter();
   const ref = useRef<HTMLFormElement>(null);
   const editing = !!player;
@@ -38,16 +38,16 @@ export default function PlayerForm({ people, player }: Props) {
         <label className="mb-1 block text-xs font-medium text-neutral-600">Linked person *</label>
         {editing ? (
           <>
-            <input type="hidden" name="person_id" value={player!.person_id} />
+            <input type="hidden" name="biography_id" value={player!.biography_id} />
             <div className={`${input} bg-neutral-100`}>{player!.person?.full_name}</div>
           </>
         ) : (
-          <select name="person_id" required defaultValue="" className={input}>
+          <select name="biography_id" required defaultValue="" className={input}>
             <option value="" disabled>Select a person…</option>
-            {people.map((p) => <option key={p.id} value={p.id}>{p.full_name}</option>)}
+            {biographies.map((p) => <option key={p.id} value={p.id}>{p.full_name}</option>)}
           </select>
         )}
-        {err("person_id") && <p className="mt-1 text-xs text-red-600">{err("person_id")}</p>}
+        {err("biography_id") && <p className="mt-1 text-xs text-red-600">{err("biography_id")}</p>}
       </div>
 
       <div className="grid grid-cols-3 gap-3">

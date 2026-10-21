@@ -12,7 +12,7 @@ const optDate = z.preprocess((v) => (v === "" ? undefined : v), z.string().date(
 export const playerSchema = z
   .object({
     person_mode: z.enum(["new", "existing"]).default("existing"),
-    person_id: z.preprocess(
+    biography_id: z.preprocess(
       (v) => (v === "" || v == null ? undefined : Number(v)),
       z.number().int().positive().optional()
     ),
@@ -33,7 +33,7 @@ export const playerSchema = z
     const issue = (path: string, message: string) =>
       ctx.addIssue({ code: "custom", path: [path], message });
 
-    if (d.person_mode === "existing" && !d.person_id) issue("person_id", "Select a person.");
+    if (d.person_mode === "existing" && !d.biography_id) issue("biography_id", "Select a person.");
     if (d.person_mode === "new") {
       if (!d.full_name || d.full_name.length < 2) issue("full_name", "Enter the full name.");
       if (d.date_of_birth && d.date_of_death && d.date_of_death < d.date_of_birth)

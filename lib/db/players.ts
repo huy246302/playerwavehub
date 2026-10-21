@@ -3,9 +3,11 @@ import { createAdminClient } from "@/lib/supabase/admin";
 
 type Person = { full_name: string; display_name: string | null } | null;
 const one = <T>(v: T | T[] | null): T | null => (Array.isArray(v) ? (v[0] ?? null) : v);
+const fail = (e: { message: string; code?: string }) =>
+  new Error(`${e.message}${e.code ? ` (${e.code})` : ""}`);
 
 export type PlayerRow = {
-  id: number; person_id: number; height_cm: number | null; legacy_summary: string | null;
+  id: number; biography_id: number; height_cm: number | null; legacy_summary: string | null;
   career_start_year: number | null; retired_year: number | null;
   is_published: boolean; updated_at: string; person: Person;
 };
@@ -16,7 +18,7 @@ export type PlayerFilters = {
 };
 
 const COLS =
-  "id, person_id, height_cm, legacy_summary, career_start_year, retired_year, is_published, updated_at, person:people!inner(full_name, display_name)";
+  "id, biography_id, height_cm, legacy_summary, career_start_year, retired_year, is_published, updated_at, person:biographies!inner(full_name, display_name)";
 
 export async function listPlayers(f: PlayerFilters) {
   const sb = createAdminClient();
@@ -27,13 +29,13 @@ export async function listPlayers(f: PlayerFilters) {
     .order("updated_at", { ascending: false })
     .range((page - 1) * size, page * size - 1);
 
-  if (f.q) q = q.ilike("people.full_name", `%${f.q}%`);
+  if (f.q) q = q.ilike("person.full_name", `%${f.q}%`);
   if (f.status) q = q.eq("is_published", f.status === "published");
   if (f.from) q = q.gte("career_start_year", f.from);
   if (f.to) q = q.lte("retired_year", f.to);
 
   const { data, count, error } = await q;
-  if (error) throw error;
+  if (error) throw fail(error);
 
   const rows: PlayerRow[] = (data ?? []).map((r) => ({
     ...r,
@@ -56,8 +58,8 @@ export async function statusCounts() {
 export async function getPlayer(id: number) {
   const sb = createAdminClient();
   const { data, error } = await sb.from("players")
-    .select("*, person:people(full_name, display_name)").eq("id", id).maybeSingle();
-  if (error) throw error;
+    .select("*, person:biographies(full_name, display_name)").eq("id", id).maybeSingle();
+  if (error) throw fail(error);
   if (!data) return null;
 
   const ids = [data.created_by, data.updated_by].filter(Boolean) as string[];
@@ -76,13 +78,15 @@ export async function getPlayer(id: number) {
   };
 }
 
-export async function listAvailablePeople() {
+export async function listAvailableBiographies() {
   const sb = createAdminClient();
-  const { data: taken } = await sb.from("players").select("person_id");
-  const ids = (taken ?? []).map((r) => r.person_id);
-  let q = sb.from("people").select("id, full_name").order("full_name");
+  const { data: taken, error: e1 } = await sb.from("players").select("biography_id");
+  if (e1) throw fail(e1);
+  const ids = (taken ?? []).map((r) => r.biography_id);
+
+  let q = sb.from("biographies").select("id, full_name").order("full_name");
   if (ids.length) q = q.not("id", "in", `(${ids.join(",")})`);
   const { data, error } = await q;
-  if (error) throw error;
+  if (error) throw fail(error);
   return data ?? [];
 }

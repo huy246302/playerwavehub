@@ -2,8 +2,9 @@
 import { revalidatePath } from "next/cache";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { requireAdmin } from "@/lib/auth";
-import { insertPerson } from "@/lib/people";
+import { insertPerson } from "@/lib/biographies";
 import { playerSchema, type PlayerInput } from "@/lib/validation/player";
+import { z } from "zod";
 
 export type FormState = {
   ok: boolean;
@@ -22,11 +23,11 @@ const playerFields = (d: PlayerInput) => ({
 export async function createPlayer(_: FormState, fd: FormData): Promise<FormState> {
   const user = await requireAdmin();
   const parsed = playerSchema.safeParse(Object.fromEntries(fd));
-  if (!parsed.success) return { ok: false, errors: parsed.error.flatten().fieldErrors };
+  if (!parsed.success) return { ok: false, errors: z.flattenError(parsed.error).fieldErrors };
   const d = parsed.data;
   const sb = createAdminClient();
 
-  let personId = d.person_id!;
+  let personId = d.biography_id!;
   let createdPersonId: number | null = null;
 
   if (d.person_mode === "new") {
@@ -47,13 +48,12 @@ export async function createPlayer(_: FormState, fd: FormData): Promise<FormStat
 
   const { error } = await sb
     .from("players")
-    .insert({ ...playerFields(d), person_id: personId, created_by: user.id, updated_by: user.id });
+    .insert({ ...playerFields(d), biography_id: personId, created_by: user.id, updated_by: user.id });
 
   if (error) {
-    // no transaction here, so undo the person we just created
-    if (createdPersonId) await sb.from("people").delete().eq("id", createdPersonId);
+    if (createdPersonId) await sb.from("biographies").delete().eq("id", createdPersonId);
     if (error.code === "23505")
-      return { ok: false, errors: { person_id: ["This person already has a player record."] } };
+      return { ok: false, errors: { biography_id: ["This person already has a player record."] } };
     return { ok: false, message: error.message };
   }
 
@@ -64,7 +64,7 @@ export async function createPlayer(_: FormState, fd: FormData): Promise<FormStat
 export async function updatePlayer(id: number, _: FormState, fd: FormData): Promise<FormState> {
   const user = await requireAdmin();
   const parsed = playerSchema.safeParse(Object.fromEntries(fd));
-  if (!parsed.success) return { ok: false, errors: parsed.error.flatten().fieldErrors };
+  if (!parsed.success) return { ok: false, errors: z.flattenError(parsed.error).fieldErrors };
 
   const { error } = await createAdminClient()
     .from("players")

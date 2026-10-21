@@ -5,7 +5,7 @@ import SidebarNav from "./SidebarNav";
 
 async function getCounts() {
   const sb = createAdminClient();
-  const tables = ["people", "players", "coaches", "clubs", "national_teams", "countries", "sources"];
+  const tables = ["biographies", "players", "coaches", "clubs", "national_teams", "countries", "sources"];
   const results = await Promise.all(
     tables.map((t) => sb.from(t).select("*", { count: "exact", head: true }))
   );
@@ -31,7 +31,7 @@ export async function Sidebar() {
       <section className="sidebar-note">
         <ArchiveIcon name="book" />
         <h2>The game remembered.<br />One story at a time.</h2>
-        <p>A home for football&apos;s people, places and history.</p>
+        <p>A home for football&apos;s biographies, places and history.</p>
       </section>
     </aside>
   );

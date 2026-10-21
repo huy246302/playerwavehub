@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { listPlayers, listAvailablePeople, getPlayer, statusCounts } from "@/lib/db/players";
+import { listPlayers, listAvailableBiographies, getPlayer, statusCounts } from "@/lib/db/players";
 import PlayersTable from "@/components/players/PlayersTable";
 import PlayerForm from "@/components/players/PlayerForm";
 
@@ -21,14 +21,14 @@ export default async function PlayersPage({ searchParams }: { searchParams: Prom
   const selectedId = sp.id ? Number(sp.id) : null;
   const editing = sp.edit === "1" && selectedId !== null;
 
-  const [{ rows, total, pageSize }, counts, people, selected] = await Promise.all([
+  const [{ rows, total, pageSize }, counts, biographies, selected] = await Promise.all([
     listPlayers({
       q: sp.q, status, page,
       from: sp.from ? Number(sp.from) : undefined,
       to: sp.to ? Number(sp.to) : undefined,
     }),
     statusCounts(),
-    listAvailablePeople(),
+    listAvailableBiographies(),
     selectedId ? getPlayer(selectedId) : Promise.resolve(null),
   ]);
 
@@ -86,7 +86,7 @@ export default async function PlayersPage({ searchParams }: { searchParams: Prom
         <div>
           <h2 className="mb-3 font-serif text-2xl text-neutral-900">{editing ? "Edit player" : "New player"}</h2>
           <div className="rounded-xl border border-neutral-200 bg-[#fbfaf6] p-5">
-            <PlayerForm people={people} player={editing ? selected : null} />
+            <PlayerForm biographies={biographies} player={editing ? selected : null} />
           </div>
         </div>
 
@@ -100,7 +100,7 @@ export default async function PlayersPage({ searchParams }: { searchParams: Prom
             {selected ? (
               <dl className="space-y-1.5 text-neutral-600">
                 <div className="flex justify-between"><dt>Record ID</dt><dd>{selected.id}</dd></div>
-                <div className="flex justify-between"><dt>Linked person ID</dt><dd>{selected.person_id}</dd></div>
+                <div className="flex justify-between"><dt>Linked person ID</dt><dd>{selected.biography_id}</dd></div>
                 <div className="flex justify-between"><dt>Created at</dt><dd>{fmt(selected.created_at)}</dd></div>
                 <div className="flex justify-between"><dt>Created by</dt><dd>{selected.created_by_name ?? "—"}</dd></div>
                 <div className="flex justify-between"><dt>Updated at</dt><dd>{fmt(selected.updated_at)}</dd></div>

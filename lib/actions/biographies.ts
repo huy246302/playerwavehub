@@ -21,7 +21,7 @@ export async function createPerson(_: FormState, fd: FormData): Promise<FormStat
   // slug is UNIQUE: retry with a random suffix on conflict
   for (let i = 0; i < 3; i++) {
     const slug = i === 0 ? base : `${base}-${Math.random().toString(36).slice(2, 6)}`;
-    const { error } = await sb.from("people").insert({
+    const { error } = await sb.from("biographies").insert({
       slug, full_name: d.full_name, display_name: d.display_name ?? null,
       date_of_birth: d.date_of_birth ?? null, date_of_death: d.date_of_death ?? null,
       birthplace: d.birthplace ?? null, bio: d.bio ?? null,
@@ -36,11 +36,11 @@ export async function createPerson(_: FormState, fd: FormData): Promise<FormStat
   return { ok: false, message: "Could not generate a unique slug." };
 }
 
-export async function deletePerson(id: number) {
+export async function deleteBiography(id: number) {
   await requireAdmin();
-  const { error } = await createAdminClient().from("people").delete().eq("id", id);
+  const { error } = await createAdminClient().from("biographies").delete().eq("id", id);
   if (error?.code === "23503") {
-    throw new Error("This person is linked to a player, coach or source. Remove those first.");
+    throw new Error("This biography is linked to a player, coach or source. Remove those first.");
   }
   if (error) throw new Error(error.message);
   revalidatePath("/", "layout");

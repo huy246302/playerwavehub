@@ -1,8 +1,8 @@
 "use client";
 import { useTransition } from "react";
-import { deletePerson } from "@/lib/actions/people";
+import { deleteBiography } from "@/lib/actions/biographies";
 
-export default function DeletePersonButton({ id, name }: { id: number; name: string }) {
+export default function DeleteBiographyButton({ id, name }: { id: number; name: string }) {
   const [pending, start] = useTransition();
   return (
     <button
@@ -11,7 +11,7 @@ export default function DeletePersonButton({ id, name }: { id: number; name: str
       onClick={() => {
         if (!confirm(`Delete ${name}?`)) return;
         start(async () => {
-          try { await deletePerson(id); }
+          try { await deleteBiography(id); }
           catch (e) { alert((e as Error).message); }
         });
       }}

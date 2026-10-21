@@ -35,33 +35,48 @@ The easiest way to deploy your Next.js app is to use the [Vercel Platform](https
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
 
+
 ```
 playerwavehub
 ├─ app
+│  ├─ (admin)
+│  │  ├─ layout.tsx
+│  │  ├─ page.tsx
+│  │  ├─ people
+│  │  │  └─ page.tsx
+│  │  └─ players
+│  │     └─ page.tsx
 │  ├─ favicon.ico
 │  ├─ globals.css
 │  ├─ layout.tsx
-│  ├─ page.tsx
-│  ├─ people
-│  └─ players
+│  └─ login
+│     ├─ action.ts
+│     ├─ LoginForm.tsx
 │     └─ page.tsx
 ├─ components
+│  ├─ ArchiveIcon.tsx
+│  ├─ Biographies
+│  │  ├─ BiographiesForm.tsx
+│  │  └─ DeletePersonButton.tsx
 │  ├─ players
-│  │  └─ PlayerForm.tsx
-│  └─ Sidebar.tsx
+│  │  ├─ PlayerForm.tsx
+│  │  └─ PlayersTable.tsx
+│  ├─ Sidebar.tsx
+│  └─ SidebarNav.tsx
 ├─ eslint.config.mjs
 ├─ lib
 │  ├─ actions
+│  │  ├─ biographies.ts
 │  │  └─ players.ts
 │  ├─ auth.ts
+│  ├─ biographies.ts
 │  ├─ db
 │  │  └─ players.ts
-│  ├─ login
-│  │  └─ page.tsx
 │  ├─ supabase
 │  │  ├─ admin.ts
 │  │  └─ server.ts
 │  └─ validation
+│     ├─ person.ts
 │     └─ player.ts
 ├─ next.config.ts
 ├─ package-lock.json
@@ -88,7 +103,8 @@ playerwavehub
 │  │  └─ storage-version
 │  ├─ config.toml
 │  └─ migrations
-│     └─ 20261017165713_init.sql
+│     ├─ 20261017165713_init.sql
+│     └─ 20261019192749_rename_people_to_biographies.sql
 └─ tsconfig.json
 
 ```
