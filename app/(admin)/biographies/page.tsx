@@ -1,14 +1,24 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import BiographiesForm from "@/components/biographies/BiographiesForm";
 import DeletePersonButton from "@/components/biographies/DeletePersonButton";
+import Link from "next/link";
 
-export default async function BiographiesPage() {
-  const { data: biographies } = await createAdminClient()
-    .from("biographies")
-    .select("id, full_name, display_name, date_of_birth, birthplace, updated_at")
-    .order("updated_at", { ascending: false })
-    .limit(100);
+export default async function BiographiesPage({
+  searchParams,
+}: { searchParams: Promise<{ edit?: string }> }) {
+  const { edit } = await searchParams;
+  const sb = createAdminClient();
 
+  const [{ data: biographies }, { data: editing }] = await Promise.all([
+    sb.from("biographies")
+      .select("id, full_name, display_name, date_of_birth, birthplace, updated_at")
+      .order("updated_at", { ascending: false }).limit(100),
+    edit
+      ? sb.from("biographies")
+          .select("id, full_name, display_name, date_of_birth, date_of_death, birthplace, bio")
+          .eq("id", Number(edit)).maybeSingle()
+      : Promise.resolve({ data: null }),
+  ]);
   const rows = biographies ?? [];
 
   return (
@@ -44,6 +54,7 @@ export default async function BiographiesPage() {
                 <td className="px-2 py-2.5">{p.date_of_birth ?? "—"}</td>
                 <td className="px-2 py-2.5">{p.birthplace ?? "—"}</td>
                 <td className="px-2 py-2.5 text-right">
+                  <Link href={`/biographies?edit=${p.id}#form`} className="mr-3 text-sm underline">Edit</Link>
                   <DeletePersonButton id={p.id} name={p.full_name} />
                 </td>
               </tr>
@@ -52,10 +63,12 @@ export default async function BiographiesPage() {
         </table>
       </section>
 
-      <section>
-        <h2 className="mb-3 font-serif text-2xl text-neutral-900">New biography</h2>
+      <section id="form">
+        <h2 className="mb-3 font-serif text-2xl text-neutral-900">
+          {editing ? "Edit biography" : "New biography"}
+        </h2>
         <div className="max-w-2xl rounded-xl border border-neutral-200 bg-[#fbfaf6] p-5">
-          <BiographiesForm />
+          <BiographiesForm biography={editing} />
         </div>
       </section>
     </div>

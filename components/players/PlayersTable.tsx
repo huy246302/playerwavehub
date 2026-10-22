@@ -22,7 +22,7 @@ export default function PlayersTable({ rows }: { rows: PlayerRow[] }) {
     const p = new URLSearchParams(sp.toString());
     p.delete("id"); p.delete("edit");
     Object.entries(extra).forEach(([k, v]) => p.set(k, v));
-    router.push(`/players?${p.toString()}`);
+    router.push(`/players?${p.toString()}#new`);
   };
 
   const remove = () => {
@@ -76,7 +76,7 @@ export default function PlayersTable({ rows }: { rows: PlayerRow[] }) {
             </tr>
           )}
           {rows.map((r) => (
-            <tr key={r.id} className={`border-t border-neutral-200 ${selected.includes(r.id) ? "bg-[#e8efe9]" : ""}`}>
+            <tr key={r.id} onClick={() => toggle(r.id)} className={`cursor-pointer border-t border-neutral-200 ${selected.includes(r.id) ? "bg-[#e8efe9]" : ""}`}>
               <td className="px-4 py-2.5">
                 <input type="checkbox" checked={selected.includes(r.id)} onChange={() => toggle(r.id)} />
               </td>

@@ -4,6 +4,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { requireAdmin } from "@/lib/auth";
 import { personSchema } from "@/lib/validation/person";
 import type { FormState } from "@/lib/actions/players";
+import { z } from "zod";
 
 const slugify = (s: string) =>
   s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/gi, "d")
@@ -34,6 +35,27 @@ export async function createPerson(_: FormState, fd: FormData): Promise<FormStat
     if (error.code !== "23505") return { ok: false, message: error.message };
   }
   return { ok: false, message: "Could not generate a unique slug." };
+}
+
+export async function updateBiography(id: number, _: FormState, fd: FormData): Promise<FormState> {
+  const user = await requireAdmin();
+  const parsed = personSchema.safeParse(Object.fromEntries(fd));
+  if (!parsed.success) return { ok: false, errors: z.flattenError(parsed.error).fieldErrors };
+  const d = parsed.data;
+
+  const { error } = await createAdminClient().from("biographies").update({
+    full_name: d.full_name,
+    display_name: d.display_name ?? null,
+    date_of_birth: d.date_of_birth ?? null,
+    date_of_death: d.date_of_death ?? null,
+    birthplace: d.birthplace ?? null,
+    bio: d.bio ?? null,
+    updated_by: user.id,
+  }).eq("id", id);
+
+  if (error) return { ok: false, message: error.message };
+  revalidatePath("/", "layout");
+  return { ok: true, message: "Biography updated." };
 }
 
 export async function deleteBiography(id: number) {
