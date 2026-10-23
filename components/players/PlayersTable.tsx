@@ -78,7 +78,7 @@ export default function PlayersTable({ rows }: { rows: PlayerRow[] }) {
           {rows.map((r) => (
             <tr key={r.id} onClick={() => toggle(r.id)} className={`cursor-pointer border-t border-neutral-200 ${selected.includes(r.id) ? "bg-[#e8efe9]" : ""}`}>
               <td className="px-4 py-2.5">
-                <input type="checkbox" checked={selected.includes(r.id)} onChange={() => toggle(r.id)} />
+                <input type="checkbox" checked={selected.includes(r.id)} onClick={(e) => e.stopPropagation()} onChange={() => toggle(r.id)} />
               </td>
               <td className="px-2 py-2.5 font-medium">{r.person?.full_name ?? "—"}</td>
               <td className="px-2 py-2.5">{r.career_start_year ?? "?"}–{r.retired_year ?? "…"}</td>
@@ -89,7 +89,7 @@ export default function PlayersTable({ rows }: { rows: PlayerRow[] }) {
                   {r.is_published ? "Published" : "Draft"}
                 </span>
               </td>
-              <td className="px-2 py-2.5 text-neutral-500">{new Date(r.updated_at).toLocaleDateString()}</td>
+              <td className="px-2 py-2.5 text-neutral-500">{new Date(r.updated_at).toLocaleDateString("en-GB", { timeZone: "UTC" })}</td>
             </tr>
           ))}
         </tbody>

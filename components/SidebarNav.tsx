@@ -8,7 +8,7 @@ type Item = { label: string; href: string; icon: IconName; countKey?: string; su
 const collection: Item[] = [
   { label: "Biographies", href: "/biographies", icon: "people", countKey: "biographies" },
   { label: "Players", href: "/players", icon: "player", countKey: "players", sub: true },
-  { label: "Head coaches", href: "/head-coaches", icon: "coach", countKey: "coaches", sub: true },
+  { label: "Head coaches", href: "/head-coach", icon: "coach", countKey: "coaches", sub: true },
   { label: "Clubs", href: "/clubs", icon: "club", countKey: "clubs" },
   { label: "National teams", href: "/national-teams", icon: "team", countKey: "national_teams" },
   { label: "Countries", href: "/countries", icon: "country", countKey: "countries" },
