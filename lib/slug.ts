@@ -5,14 +5,13 @@ export const slugify = (s: string) =>
   s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/gi, "d")
     .toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 
-type DbError = { message: string; code?: string; details?: string };
-
-// Insert a row with a slug generated from `name`; retries with a random suffix on a slug clash.
+// type DbError = { message: string; code?: string; details?: string };
+  
 export async function insertWithSlug(
-  table: "countries" | "clubs",
+  table: "countries" | "clubs" | "national_teams",
   name: string,
   row: Record<string, unknown>
-): Promise<{ id?: number; error?: DbError }> {
+): Promise<{ id?: number; error?: { message: string; code?: string; details?: string } }> {
   const sb = createAdminClient();
   const base = slugify(name) || table.slice(0, -1);
 
