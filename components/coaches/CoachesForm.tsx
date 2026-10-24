@@ -46,7 +46,7 @@ export default function CoachForm({ biographies, coach }: Props) {
       type="button"
       onClick={() => setMode(value)}
       className={`rounded-md px-3 py-1.5 text-sm ${
-        mode === value ? "bg-[#254a39] text-white" : "border border-neutral-300 text-neutral-600"
+        mode === value ? "bg-[#47d392] text-white" : "border border-neutral-300 text-neutral-600"
       }`}
     >
       {label}
@@ -136,7 +136,7 @@ export default function CoachForm({ biographies, coach }: Props) {
               className="rounded-md border border-neutral-300 px-4 py-2 text-sm">Cancel</button>
           )}
           <button disabled={pending}
-            className="rounded-md bg-[#254a39] px-4 py-2 text-sm font-medium text-white hover:bg-[#1d3b2e] disabled:opacity-60">
+            className="rounded-md bg-[#47d392] px-4 py-2 text-sm font-medium text-white hover:bg-[#1d3b2e] disabled:opacity-60">
             {pending ? "Saving…" : editing ? "Save changes" : "Save head coach"}
           </button>
         </div>

@@ -11,7 +11,7 @@ export default async function LoginPage() {
     <div className="flex min-h-screen items-center justify-center bg-[#f6f4ee] px-4">
       <div className="w-full max-w-sm">
         <div className="mb-8 flex items-center justify-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-md bg-[#254a39] font-serif text-xl font-bold text-white">
+          <div className="flex h-10 w-10 items-center justify-center rounded-md bg-[#47d392] font-serif text-xl font-bold text-white">
             F
           </div>
           <div className="leading-tight">

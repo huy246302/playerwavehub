@@ -48,7 +48,7 @@ export default async function HeadCoachPage({ searchParams }: { searchParams: Pr
           <h1 className="font-serif text-4xl text-neutral-900">Head coaches</h1>
           <p className="mt-1 text-sm text-neutral-500">Preserve coaching careers and the stories behind the tactics.</p>
         </div>
-        <Link href="/head-coach#new" className="rounded-md bg-[#254a39] px-4 py-2 text-sm font-medium text-white">+ Add head coach</Link>
+        <Link href="/head-coach#new" className="rounded-md bg-[#47d392] px-4 py-2 text-sm font-medium text-white">+ Add head coach</Link>
       </header>
 
       <section className="rounded-xl border border-neutral-200 bg-[#fbfaf6]">
