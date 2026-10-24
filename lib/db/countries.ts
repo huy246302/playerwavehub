@@ -47,10 +47,18 @@ export async function getCountry(id: number) {
   };
 }
 
-// for dropdowns on the Clubs / National teams / Biographies forms
 export async function listCountryOptions() {
   const { data, error } = await createAdminClient()
     .from("countries").select("id, name").order("name");
   if (error) throw fail(error);
   return (data ?? []) as { id: number; name: string }[];
+}
+
+export async function isoCodeTaken(iso: string, excludeId?: number) {
+  const sb = createAdminClient();
+  let q = sb.from("countries").select("id").eq("iso_code", iso);
+  if (excludeId) q = q.neq("id", excludeId);
+  const { data, error } = await q.maybeSingle();
+  if (error) throw fail(error);
+  return !!data;
 }
