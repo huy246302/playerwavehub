@@ -20,3 +20,8 @@ export const optInt = (min: number, max: number) =>
     const b = blank(v);
     return b === undefined ? undefined : Number(b);
   }, z.number().int().min(min).max(max).optional());
+
+export const toNumber = (v: unknown) => {
+  const b = blank(v);
+  return b === undefined ? undefined : Number(b);
+};

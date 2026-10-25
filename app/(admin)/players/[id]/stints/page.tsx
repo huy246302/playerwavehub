@@ -1,7 +1,12 @@
 import { notFound } from "next/navigation";
 import { getPlayer } from "@/lib/db/players";
+import { listClubStints, listNationalStints } from "@/lib/db/player-stints";
+import { listClubOptions } from "@/lib/db/clubs";
+import { listNationalTeamOptions } from "@/lib/db/national-teams";
+import ClubStintsCard from "@/components/players/stints/ClubStintsCard";
+import NationalStintsCard from "@/components/players/stints/NationalStintsCard";
 import { DetailTabs } from "@/components/ui/DetailTabs";
-import { Breadcrumbs, Card, PageHeader } from "@/components/ui/kit";
+import { Breadcrumbs, PageHeader } from "@/components/ui/kit";
 
 const TABS = [
   { key: "overview", label: "Overview" }, { key: "attributes", label: "Attributes" },
@@ -9,11 +14,13 @@ const TABS = [
   { key: "sources", label: "Sources" },
 ];
 
-export default async function PlayerHiddenAttributesPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function PlayerStintsPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const num = Number(id);
   if (!Number.isInteger(num)) notFound();
-  const player = await getPlayer(num);
+  const [player, clubStints, nationalStints, clubs, teams] = await Promise.all([
+    getPlayer(num), listClubStints(num), listNationalStints(num), listClubOptions(), listNationalTeamOptions(),
+  ]);
   if (!player) notFound();
   const basePath = `/players/${player.id}`;
 
@@ -21,13 +28,14 @@ export default async function PlayerHiddenAttributesPage({ params }: { params: P
     <div className="space-y-6">
       <Breadcrumbs items={[
         { label: "Archive", href: "/" }, { label: "Players", href: "/players" },
-        { label: player.person?.full_name ?? `Player #${player.id}`, href: basePath }, { label: "Hidden attributes" },
+        { label: player.person?.full_name ?? `Player #${player.id}`, href: basePath }, { label: "Career stints" },
       ]} />
-      <PageHeader title="Hidden attributes" description="Managed separately from published content." />
-      <DetailTabs basePath={basePath} current="hidden-attributes" tabs={TABS} />
-      <Card title="Not built yet">
-        <p className="text-sm text-neutral-500">The hidden attributes editor is coming in the next build.</p>
-      </Card>
+      <PageHeader title="Career stints" description="Club and national team spells." />
+      <DetailTabs basePath={basePath} current="stints" tabs={TABS} />
+      <div className="space-y-6">
+        <ClubStintsCard playerId={player.id} stints={clubStints} clubs={clubs} />
+        <NationalStintsCard playerId={player.id} stints={nationalStints} teams={teams} />
+      </div>
     </div>
   );
 }

@@ -1,7 +1,9 @@
 import { notFound } from "next/navigation";
 import { getPlayer } from "@/lib/db/players";
+import { getPlayerHiddenAttributes } from "@/lib/db/player-hidden-attributes";
+import HiddenAttributesForm from "@/components/players/HiddenAttributesForm";
 import { DetailTabs } from "@/components/ui/DetailTabs";
-import { Breadcrumbs, Card, PageHeader } from "@/components/ui/kit";
+import { Breadcrumbs, PageHeader } from "@/components/ui/kit";
 
 const TABS = [
   { key: "overview", label: "Overview" }, { key: "attributes", label: "Attributes" },
@@ -13,7 +15,7 @@ export default async function PlayerHiddenAttributesPage({ params }: { params: P
   const { id } = await params;
   const num = Number(id);
   if (!Number.isInteger(num)) notFound();
-  const player = await getPlayer(num);
+  const [player, attrs] = await Promise.all([getPlayer(num), getPlayerHiddenAttributes(num)]);
   if (!player) notFound();
   const basePath = `/players/${player.id}`;
 
@@ -25,9 +27,7 @@ export default async function PlayerHiddenAttributesPage({ params }: { params: P
       ]} />
       <PageHeader title="Hidden attributes" description="Managed separately from published content." />
       <DetailTabs basePath={basePath} current="hidden-attributes" tabs={TABS} />
-      <Card title="Not built yet">
-        <p className="text-sm text-neutral-500">The hidden attributes editor is coming in the next build.</p>
-      </Card>
+      <HiddenAttributesForm playerId={player.id} attributes={attrs} backHref={basePath} />
     </div>
   );
 }

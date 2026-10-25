@@ -116,3 +116,12 @@ export function Pager({
     </div>
   );
 }
+
+// digits only, max length, optional upper bound — used on any plain-integer input
+export function clampDigits(maxLen: number, max?: number) {
+  return (e: React.FormEvent<HTMLInputElement>) => {
+    const el = e.currentTarget;
+    el.value = el.value.replace(/[^0-9]/g, "").slice(0, maxLen);
+    if (max != null && el.value !== "" && Number(el.value) > max) el.value = String(max);
+  };
+}

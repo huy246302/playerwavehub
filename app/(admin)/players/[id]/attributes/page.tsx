@@ -1,7 +1,10 @@
 import { notFound } from "next/navigation";
 import { getPlayer } from "@/lib/db/players";
 import { getPlayerAttributes } from "@/lib/db/player-attributes";
+import { listPlayerPositions } from "@/lib/db/player-positions";
+import { getPlayerFeet } from "@/lib/db/player-feet";
 import AttributesForm from "@/components/players/AttributesForm";
+import PositionsFeetCard from "@/components/players/PositionsFeetCard";
 import { DetailTabs } from "@/components/ui/DetailTabs";
 import { Breadcrumbs, PageHeader } from "@/components/ui/kit";
 
@@ -15,7 +18,9 @@ export default async function PlayerAttributesPage({ params }: { params: Promise
   const { id } = await params;
   const num = Number(id);
   if (!Number.isInteger(num)) notFound();
-  const [player, attrs] = await Promise.all([getPlayer(num), getPlayerAttributes(num)]);
+  const [player, attrs, positions, feet] = await Promise.all([
+    getPlayer(num), getPlayerAttributes(num), listPlayerPositions(num), getPlayerFeet(num),
+  ]);
   if (!player) notFound();
   const basePath = `/players/${player.id}`;
 
@@ -25,9 +30,10 @@ export default async function PlayerAttributesPage({ params }: { params: Promise
         { label: "Archive", href: "/" }, { label: "Players", href: "/players" },
         { label: player.person?.full_name ?? `Player #${player.id}`, href: basePath }, { label: "Attributes" },
       ]} />
-      <PageHeader title="Player attributes" description="Technical, mental, physical and goalkeeping ratings, 1–100." />
+      <PageHeader title="Player attributes" description="Technical, mental, physical, goalkeeping ratings, positions and foot." />
       <DetailTabs basePath={basePath} current="attributes" tabs={TABS} />
       <AttributesForm playerId={player.id} attributes={attrs} backHref={basePath} />
+      <PositionsFeetCard playerId={player.id} positions={positions} feet={feet} />
     </div>
   );
 }
