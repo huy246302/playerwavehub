@@ -1,47 +1,55 @@
 import "server-only";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { fail, one, PAGE_SIZE } from "@/lib/db/util";
 
-type Person = { full_name: string; display_name: string | null } | null;
-const one = <T>(v: T | T[] | null): T | null => (Array.isArray(v) ? (v[0] ?? null) : v);
-const fail = (e: { message: string; code?: string }) =>
-  new Error(`${e.message}${e.code ? ` (${e.code})` : ""}`);
+type Person = { id: number; full_name: string; display_name: string | null } | null;
 
 export type PlayerRow = {
   id: number; biography_id: number; height_cm: number | null; legacy_summary: string | null;
   career_start_year: number | null; retired_year: number | null;
-  is_published: boolean; updated_at: string; person: Person;
+  is_published: boolean; updated_at: string; person: Person; updated_by_name: string | null;
 };
 
 export type PlayerFilters = {
   q?: string; status?: "draft" | "published";
-  from?: number; to?: number; page?: number; pageSize?: number;
+  from?: number; to?: number; heightMin?: number; heightMax?: number; page?: number;
 };
 
 const COLS =
-  "id, biography_id, height_cm, legacy_summary, career_start_year, retired_year, is_published, updated_at, person:biographies!inner(full_name, display_name)";
+  "id, biography_id, height_cm, legacy_summary, career_start_year, retired_year, is_published, updated_at, updated_by, person:biographies!inner(id, full_name, display_name)";
+
+async function profileNames(ids: (string | null)[]) {
+  const unique = [...new Set(ids.filter(Boolean))] as string[];
+  if (!unique.length) return new Map<string, string>();
+  const { data } = await createAdminClient().from("profiles").select("id, display_name").in("id", unique);
+  return new Map((data ?? []).map((p) => [p.id, p.display_name ?? ""]));
+}
 
 export async function listPlayers(f: PlayerFilters) {
   const sb = createAdminClient();
-  const size = f.pageSize ?? 25;
-  const page = f.page ?? 1;
+  const page = f.page && f.page > 0 ? f.page : 1;
 
   let q = sb.from("players").select(COLS, { count: "exact" })
     .order("updated_at", { ascending: false })
-    .range((page - 1) * size, page * size - 1);
+    .range((page - 1) * PAGE_SIZE, page * PAGE_SIZE - 1);
 
   if (f.q) q = q.ilike("person.full_name", `%${f.q}%`);
   if (f.status) q = q.eq("is_published", f.status === "published");
   if (f.from) q = q.gte("career_start_year", f.from);
   if (f.to) q = q.lte("retired_year", f.to);
+  if (f.heightMin) q = q.gte("height_cm", f.heightMin);
+  if (f.heightMax) q = q.lte("height_cm", f.heightMax);
 
   const { data, count, error } = await q;
   if (error) throw fail(error);
 
+  const names = await profileNames((data ?? []).map((r) => r.updated_by));
   const rows: PlayerRow[] = (data ?? []).map((r) => ({
     ...r,
     person: one(r.person as Person | Person[]),
+    updated_by_name: r.updated_by ? names.get(r.updated_by) ?? null : null,
   }));
-  return { rows, total: count ?? 0, pageSize: size };
+  return { rows, total: count ?? 0, pageSize: PAGE_SIZE, page };
 }
 
 export async function statusCounts() {
@@ -58,23 +66,30 @@ export async function statusCounts() {
 export async function getPlayer(id: number) {
   const sb = createAdminClient();
   const { data, error } = await sb.from("players")
-    .select("*, person:biographies(full_name, display_name)").eq("id", id).maybeSingle();
+    .select("*, person:biographies(id, full_name, display_name)").eq("id", id).maybeSingle();
   if (error) throw fail(error);
   if (!data) return null;
 
-  const ids = [data.created_by, data.updated_by].filter(Boolean) as string[];
-  let profs: { id: string; display_name: string | null }[] = [];
-  if (ids.length) {
-    const { data: p } = await sb.from("profiles").select("id, display_name").in("id", ids);
-    profs = p ?? [];
-  }
-  const name = (u: string | null) => profs.find((x) => x.id === u)?.display_name ?? null;
+  const names = await profileNames([data.created_by, data.updated_by]);
+  const head = { count: "exact" as const, head: true };
+  const [attrs, hidden, clubStints, natStints, sources] = await Promise.all([
+    sb.from("player_attributes").select("player_id", head).eq("player_id", id),
+    sb.from("player_hidden_attributes").select("player_id", head).eq("player_id", id),
+    sb.from("player_club_stints").select("id", head).eq("player_id", id),
+    sb.from("player_national_stints").select("id", head).eq("player_id", id),
+    sb.from("biography_sources").select("source_id", head).eq("biography_id", data.biography_id),
+  ]);
 
   return {
     ...data,
     person: one(data.person as Person | Person[]),
-    created_by_name: name(data.created_by),
-    updated_by_name: name(data.updated_by),
+    created_by_name: data.created_by ? names.get(data.created_by) ?? null : null,
+    updated_by_name: data.updated_by ? names.get(data.updated_by) ?? null : null,
+    hasAttributes: (attrs.count ?? 0) > 0,
+    hasHiddenAttributes: (hidden.count ?? 0) > 0,
+    clubStintCount: clubStints.count ?? 0,
+    nationalStintCount: natStints.count ?? 0,
+    sourceCount: sources.count ?? 0,
   };
 }
 
@@ -83,7 +98,6 @@ export async function listAvailableBiographies() {
   const { data: taken, error: e1 } = await sb.from("players").select("biography_id");
   if (e1) throw fail(e1);
   const ids = (taken ?? []).map((r) => r.biography_id);
-
   let q = sb.from("biographies").select("id, full_name").order("full_name");
   if (ids.length) q = q.not("id", "in", `(${ids.join(",")})`);
   const { data, error } = await q;

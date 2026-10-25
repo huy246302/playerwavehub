@@ -1,101 +1,136 @@
 "use client";
-import { useActionState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
-import { createPlayer, updatePlayer, type FormState } from "@/lib/actions/players";
+import { useActionState } from "react";
+import Link from "next/link";
+import { createPlayer, updatePlayer } from "@/lib/actions/players";
+import type { FormState } from "@/lib/form-state";
+import { Card, DefList, Field, fmtDateTime, ghostBtn, inputCls, primaryBtn } from "@/components/ui/kit";
 
-type Props = {
-  biographies: { id: number; full_name: string }[];
-  player?: {
-    id: number; biography_id: number; person: { full_name: string } | null;
-    career_start_year: number | null; retired_year: number | null;
-    height_cm: number | null; legacy_summary: string | null; is_published: boolean;
-  } | null;
+type Player = {
+  id: number; biography_id: number; career_start_year: number | null; retired_year: number | null;
+  height_cm: number | null; legacy_summary: string | null; is_published: boolean; created_at: string;
+  person: { id: number; full_name: string } | null;
+  created_by_name: string | null; updated_by_name: string | null;
 };
 
-const input =
-  "w-full rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm outline-none focus:border-[#254a39] focus:ring-2 focus:ring-[#254a39]/15";
-
-export default function PlayerForm({ biographies, player }: Props) {
-  const router = useRouter();
-  const ref = useRef<HTMLFormElement>(null);
+export default function PlayerForm({
+  player, biographies,
+}: { player?: Player | null; biographies: { id: number; full_name: string }[] }) {
   const editing = !!player;
-
   const [state, action, pending] = useActionState<FormState, FormData>(
     editing ? updatePlayer.bind(null, player!.id) : createPlayer,
     { ok: false }
   );
   const err = (k: string) => state.errors?.[k]?.[0];
-
-  useEffect(() => {
-    if (!state.ok) return;
-    if (editing) router.push(`/players?id=${player!.id}`);
-    else ref.current?.reset();
-  }, [state, editing, player, router]);
+  const val = (k: string, fallback?: string | null) => state.values?.[k] ?? fallback ?? "";
+  const biographyId = state.values?.biography_id ?? (player?.biography_id ? String(player.biography_id) : "");
+  const status = state.values?.status ?? (player?.is_published ? "published" : "draft");
 
   return (
-    <form ref={ref} action={action} key={player?.id ?? "new"} className="space-y-4">
-      <div>
-        <label className="mb-1 block text-xs font-medium text-neutral-600">Linked person *</label>
-        {editing ? (
-          <>
-            <input type="hidden" name="biography_id" value={player!.biography_id} />
-            <div className={`${input} bg-neutral-100`}>{player!.person?.full_name}</div>
-          </>
-        ) : (
-          <select name="biography_id" required defaultValue="" className={input}>
-            <option value="" disabled>Select a person…</option>
-            {biographies.map((p) => <option key={p.id} value={p.id}>{p.full_name}</option>)}
-          </select>
-        )}
-        {err("biography_id") && <p className="mt-1 text-xs text-red-600">{err("biography_id")}</p>}
+    <form action={action} className="space-y-6">
+      <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
+        <div className="space-y-6">
+          <Card title="Linked biography" note="Required">
+            {editing ? (
+              <>
+                <input type="hidden" name="biography_id" value={player!.biography_id} />
+                <div className={`${inputCls} bg-neutral-100`}>{player!.person?.full_name}</div>
+                <p className="mt-1 text-xs text-neutral-400">The linked biography cannot be changed after saving.</p>
+              </>
+            ) : (
+              <>
+                <Field label="Linked biography" required error={err("biography_id")}>
+                  <select name="biography_id" defaultValue={biographyId} className={inputCls}>
+                    <option value="">{biographies.length ? "Select an eligible biography…" : "No eligible biographies"}</option>
+                    {biographies.map((p) => <option key={p.id} value={p.id}>{p.full_name}</option>)}
+                  </select>
+                </Field>
+                <p className="mt-1 text-xs text-neutral-400">
+                  Choose a biography without an existing player record. One record per biography per role.
+                </p>
+                <Link href="/biographies/new" target="_blank" rel="noopener noreferrer"
+                  className="mt-1 inline-block text-xs text-[#254a39] underline">
+                  + Create biography
+                </Link>
+              </>
+            )}
+          </Card>
+
+          <Card title="Career & legacy" note="Optional">
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Field label="Career start year" error={err("career_start_year")}>
+                <input name="career_start_year" inputMode="numeric" placeholder="YYYY" className={inputCls}
+                  defaultValue={val("career_start_year", player?.career_start_year ? String(player.career_start_year) : undefined)} />
+              </Field>
+              <Field label="Retired year" error={err("retired_year")}>
+                <input name="retired_year" inputMode="numeric" placeholder="YYYY" className={inputCls}
+                  defaultValue={val("retired_year", player?.retired_year ? String(player.retired_year) : undefined)} />
+              </Field>
+            </div>
+            <p className="mt-1 text-xs text-neutral-400">
+              Use four-digit years. Retired year must be equal to or later than career start year when both are entered.
+            </p>
+            <div className="mt-4">
+              <Field label="Height (cm)" error={err("height_cm")} hint="Optional · Enter a value from 120 to 230 cm.">
+                <input name="height_cm" inputMode="numeric" placeholder="Enter height" className={inputCls}
+                  defaultValue={val("height_cm", player?.height_cm ? String(player.height_cm) : undefined)} />
+              </Field>
+            </div>
+            <div className="mt-4">
+              <Field label="Legacy summary" error={err("legacy_summary")} hint="Optional · Keep the story concise and grounded in sources.">
+                <textarea name="legacy_summary" rows={4} placeholder="Summarise this player's contribution to the game…"
+                  className={inputCls} defaultValue={val("legacy_summary", player?.legacy_summary)} />
+              </Field>
+            </div>
+          </Card>
+        </div>
+
+        <aside className="space-y-6">
+          <Card title="Publication">
+            <p className="mb-2 text-xs font-medium uppercase tracking-wide text-neutral-400">
+              {editing ? "Current status" : "New record"}
+            </p>
+            <label className={`mb-2 flex cursor-pointer items-start gap-2 rounded-md border p-3 text-sm ${status === "draft" ? "border-[#254a39] bg-[#eef3ef]" : "border-neutral-200"}`}>
+              <input type="radio" name="status" value="draft" defaultChecked={status === "draft"} className="mt-0.5" />
+              <span><span className="font-medium">Draft</span><br /><span className="text-neutral-500">Keep unpublished while you work.</span></span>
+            </label>
+            <label className={`flex cursor-pointer items-start gap-2 rounded-md border p-3 text-sm ${status === "published" ? "border-[#254a39] bg-[#eef3ef]" : "border-neutral-200"}`}>
+              <input type="radio" name="status" value="published" defaultChecked={status === "published"} className="mt-0.5" />
+              <span><span className="font-medium">Publish</span><br /><span className="text-neutral-500">Publish when this record is ready.</span></span>
+            </label>
+            {err("status") && <p className="mt-2 text-xs text-red-600">{err("status")}</p>}
+            {!editing && <p className="mt-2 text-xs text-neutral-400">Draft is selected by default. The selected status is applied when you save.</p>}
+          </Card>
+
+          <Card title="Before you save">
+            <ul className="list-disc space-y-1.5 pl-4 text-sm text-neutral-600">
+              <li>Only the linked biography is required. Career years, height and the legacy summary can be added later.</li>
+              <li>Related records and attributes stay separate from the core record.</li>
+              <li>Publishing requires a full attributes record.</li>
+            </ul>
+          </Card>
+
+          <Card title="System information" note="Read only">
+            <DefList rows={
+              editing
+                ? [
+                    ["Record ID", player!.id],
+                    ["Created by", player!.created_by_name ?? "—"],
+                    ["Updated by", player!.updated_by_name ?? "—"],
+                    ["Created", fmtDateTime(player!.created_at)],
+                  ]
+                : [["Record ID", "Generated on save"], ["Created by, updated by", "Set by the system after saving"]]
+            } />
+          </Card>
+        </aside>
       </div>
 
-      <div className="grid grid-cols-3 gap-3">
-        <div>
-          <label className="mb-1 block text-xs font-medium text-neutral-600">Career start year</label>
-          <input name="career_start_year" inputMode="numeric" placeholder="YYYY" className={input}
-            defaultValue={player?.career_start_year ?? ""} />
-          {err("career_start_year") && <p className="mt-1 text-xs text-red-600">{err("career_start_year")}</p>}
-        </div>
-        <div>
-          <label className="mb-1 block text-xs font-medium text-neutral-600">Retired year</label>
-          <input name="retired_year" inputMode="numeric" placeholder="YYYY · optional" className={input}
-            defaultValue={player?.retired_year ?? ""} />
-          {err("retired_year") && <p className="mt-1 text-xs text-red-600">{err("retired_year")}</p>}
-        </div>
-        <div>
-          <label className="mb-1 block text-xs font-medium text-neutral-600">Height (cm)</label>
-          <input name="height_cm" inputMode="numeric" placeholder="120–230 · optional" className={input}
-            defaultValue={player?.height_cm ?? ""} />
-          {err("height_cm") && <p className="mt-1 text-xs text-red-600">{err("height_cm")}</p>}
-        </div>
-      </div>
-
-      <div>
-        <label className="mb-1 block text-xs font-medium text-neutral-600">Legacy summary</label>
-        <textarea name="legacy_summary" rows={4} placeholder="Why is this person a legend? Add a short summary…"
-          className={input} defaultValue={player?.legacy_summary ?? ""} />
-      </div>
-
-      <div className="flex items-center justify-between border-t border-neutral-200 pt-4">
-        <div className="flex items-center gap-2 text-sm">
-          <span className="text-neutral-600">Publication</span>
-          <select name="status" className={`${input} w-auto`} defaultValue={player?.is_published ? "published" : "draft"}>
-            <option value="draft">Draft</option>
-            <option value="published">Published</option>
-          </select>
-        </div>
+      <div className="flex items-center justify-between border-t border-neutral-200 pt-4 text-xs text-neutral-500">
+        <span>* Required field</span>
         <div className="flex items-center gap-2">
-          {state.message && (
-            <span className={`text-sm ${state.ok ? "text-green-700" : "text-red-600"}`}>{state.message}</span>
-          )}
-          {editing && (
-            <button type="button" onClick={() => router.push("/players")}
-              className="rounded-md border border-neutral-300 px-4 py-2 text-sm">Cancel</button>
-          )}
-          <button disabled={pending}
-            className="rounded-md bg-[#47d392] px-4 py-2 text-sm font-medium text-white hover:bg-[#1d3b2e] disabled:opacity-60">
-            {pending ? "Saving…" : editing ? "Save changes" : "Save player"}
+          {state.message && <span className="text-sm text-red-600">{state.message}</span>}
+          <Link href={editing ? `/players/${player!.id}` : "/players"} className={ghostBtn}>Cancel</Link>
+          <button disabled={pending} className={primaryBtn}>
+            {pending ? "Saving…" : editing ? "Save changes" : "Save draft"}
           </button>
         </div>
       </div>

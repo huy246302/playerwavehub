@@ -5,7 +5,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { requireAdmin } from "@/lib/auth";
 import { insertPerson } from "@/lib/biographies";
 import { coachSchema, type CoachInput } from "@/lib/validation/coach";
-import type { FormState } from "@/lib/actions/players";
+import { formValues, type DeleteResult, type FormState } from "@/lib/form-state";
 
 const coachFields = (d: CoachInput) => ({
   career_start_year: d.career_start_year ?? null,
@@ -17,7 +17,9 @@ const coachFields = (d: CoachInput) => ({
 export async function createCoach(_: FormState, fd: FormData): Promise<FormState> {
   const user = await requireAdmin();
   const parsed = coachSchema.safeParse(Object.fromEntries(fd));
-  if (!parsed.success) return { ok: false, errors: z.flattenError(parsed.error).fieldErrors };
+  if (!parsed.success) {
+    return { ok: false, errors: z.flattenError(parsed.error).fieldErrors, values: formValues(fd) };
+  }
   const d = parsed.data;
   const sb = createAdminClient();
 
@@ -35,7 +37,9 @@ export async function createCoach(_: FormState, fd: FormData): Promise<FormState
       },
       user.id
     );
-    if (res.error || !res.id) return { ok: false, message: res.error ?? "Could not create the biography." };
+    if (res.error || !res.id) {
+      return { ok: false, message: res.error ?? "Could not create the biography.", values: formValues(fd) };
+    }
     biographyId = res.id;
     createdId = res.id;
   }
@@ -46,9 +50,14 @@ export async function createCoach(_: FormState, fd: FormData): Promise<FormState
 
   if (error) {
     if (createdId) await sb.from("biographies").delete().eq("id", createdId);
-    if (error.code === "23505")
-      return { ok: false, errors: { biography_id: ["This biography already has a head coach record."] } };
-    return { ok: false, message: error.message };
+    if (error.code === "23505") {
+      return {
+        ok: false,
+        errors: { biography_id: ["This biography already has a head coach record."] },
+        values: formValues(fd),
+      };
+    }
+    return { ok: false, message: error.message, values: formValues(fd) };
   }
 
   revalidatePath("/", "layout");
@@ -58,22 +67,26 @@ export async function createCoach(_: FormState, fd: FormData): Promise<FormState
 export async function updateCoach(id: number, _: FormState, fd: FormData): Promise<FormState> {
   const user = await requireAdmin();
   const parsed = coachSchema.safeParse(Object.fromEntries(fd));
-  if (!parsed.success) return { ok: false, errors: z.flattenError(parsed.error).fieldErrors };
+  if (!parsed.success) {
+    return { ok: false, errors: z.flattenError(parsed.error).fieldErrors, values: formValues(fd) };
+  }
 
   const { error } = await createAdminClient()
     .from("coaches")
     .update({ ...coachFields(parsed.data), updated_by: user.id, updated_at: new Date().toISOString() })
     .eq("id", id);
 
-  if (error) return { ok: false, message: error.message };
+  if (error) return { ok: false, message: error.message, values: formValues(fd) };
+
   revalidatePath("/", "layout");
   return { ok: true, message: "Head coach updated." };
 }
 
-export async function deleteCoaches(ids: number[]) {
+export async function deleteCoaches(ids: number[]): Promise<DeleteResult> {
   await requireAdmin();
   // attributes and stints are removed by ON DELETE CASCADE
   const { error } = await createAdminClient().from("coaches").delete().in("id", ids);
-  if (error) throw new Error(error.message);
+  if (error) return { ok: false, message: error.message };
   revalidatePath("/", "layout");
+  return { ok: true };
 }

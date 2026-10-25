@@ -40,12 +40,52 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 playerwavehub
 ├─ app
 │  ├─ (admin)
-│  │  ├─ layout.tsx
-│  │  ├─ page.tsx
-│  │  ├─ people
+│  │  ├─ biographies
 │  │  │  └─ page.tsx
+│  │  ├─ clubs
+│  │  │  ├─ new
+│  │  │  │  └─ page.tsx
+│  │  │  ├─ page.tsx
+│  │  │  └─ [id]
+│  │  │     ├─ edit
+│  │  │     │  └─ page.tsx
+│  │  │     └─ page.tsx
+│  │  ├─ countries
+│  │  │  ├─ new
+│  │  │  │  └─ page.tsx
+│  │  │  ├─ page.tsx
+│  │  │  └─ [id]
+│  │  │     ├─ edit
+│  │  │     │  └─ page.tsx
+│  │  │     └─ page.tsx
+│  │  ├─ head-coach
+│  │  │  └─ page.tsx
+│  │  ├─ layout.tsx
+│  │  ├─ national-teams
+│  │  │  ├─ new
+│  │  │  │  └─ page.tsx
+│  │  │  ├─ page.tsx
+│  │  │  └─ [id]
+│  │  │     ├─ edit
+│  │  │     │  └─ page.tsx
+│  │  │     └─ page.tsx
+│  │  ├─ page.tsx
 │  │  └─ players
-│  │     └─ page.tsx
+│  │     ├─ new
+│  │     │  └─ page.tsx
+│  │     ├─ page.tsx
+│  │     └─ [id]
+│  │        ├─ attriubtes
+│  │        │  └─ page.tsx
+│  │        ├─ edit
+│  │        │  └─ page.tsx
+│  │        ├─ hidden-attributes
+│  │        │  └─ page.tsx
+│  │        ├─ page.tsx
+│  │        ├─ sources
+│  │        │  └─ page.tsx
+│  │        └─ stints
+│  │           └─ page.tsx
 │  ├─ favicon.ico
 │  ├─ globals.css
 │  ├─ layout.tsx
@@ -55,28 +95,61 @@ playerwavehub
 │     └─ page.tsx
 ├─ components
 │  ├─ ArchiveIcon.tsx
-│  ├─ Biographies
+│  ├─ biographies
 │  │  ├─ BiographiesForm.tsx
 │  │  └─ DeletePersonButton.tsx
+│  ├─ clubs
+│  │  └─ ClubForm.tsx
+│  ├─ coaches
+│  │  ├─ CoachesForm.tsx
+│  │  └─ CoachesTable.tsx
+│  ├─ countries
+│  │  └─ CountryForm.tsx
+│  ├─ national-teams
+│  │  └─ NationalTeamForm.tsx
 │  ├─ players
-│  │  ├─ PlayerForm.tsx
-│  │  └─ PlayersTable.tsx
+│  │  ├─ AttributesForm.tsx
+│  │  └─ PlayerForm.tsx
 │  ├─ Sidebar.tsx
-│  └─ SidebarNav.tsx
+│  ├─ SidebarNav.tsx
+│  └─ ui
+│     ├─ DeleteRecordButton.tsx
+│     ├─ DetailTabs.tsx
+│     ├─ kit.tsx
+│     └─ RecordTable.tsx
 ├─ eslint.config.mjs
 ├─ lib
 │  ├─ actions
 │  │  ├─ biographies.ts
+│  │  ├─ clubs.ts
+│  │  ├─ coach.ts
+│  │  ├─ countries.ts
+│  │  ├─ national-teams.ts
+│  │  ├─ player-attributes.ts
 │  │  └─ players.ts
 │  ├─ auth.ts
 │  ├─ biographies.ts
 │  ├─ db
-│  │  └─ players.ts
+│  │  ├─ clubs.ts
+│  │  ├─ coach.ts
+│  │  ├─ countries.ts
+│  │  ├─ national-teams.ts
+│  │  ├─ player-attributes.ts
+│  │  ├─ players.ts
+│  │  └─ util.ts
+│  ├─ form-state.ts
+│  ├─ slug.ts
 │  ├─ supabase
 │  │  ├─ admin.ts
 │  │  └─ server.ts
 │  └─ validation
+│     ├─ club.ts
+│     ├─ coach.ts
+│     ├─ common.ts
+│     ├─ country.ts
+│     ├─ national-team.ts
 │     ├─ person.ts
+│     ├─ player-attributes.ts
 │     └─ player.ts
 ├─ next.config.ts
 ├─ package-lock.json
@@ -104,7 +177,9 @@ playerwavehub
 │  ├─ config.toml
 │  └─ migrations
 │     ├─ 20261017165713_init.sql
-│     └─ 20261019192749_rename_people_to_biographies.sql
+│     ├─ 20261019192749_rename_people_to_biographies.sql
+│     ├─ 20261020180311_finish_biographies_rename.sql
+│     └─ 20261023161202_restrict_biography_delete.sql
 └─ tsconfig.json
 
 ```

@@ -2,7 +2,7 @@
 import { useActionState, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createCoach, updateCoach } from "@/lib/actions/coach";
-import type { FormState } from "@/lib/actions/players";
+import type { FormState } from "@/lib/form-state";
 
 type Props = {
   biographies: { id: number; full_name: string }[];
