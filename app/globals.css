@@ -587,6 +587,134 @@ svg {
   line-height: 1.45;
 }
 
+.recent-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.recent-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 1px;
+  border-bottom: 1px solid #e7e8e1;
+}
+
+.recent-item:last-child {
+  border-bottom: 0;
+}
+
+.recent-item:hover .recent-main strong {
+  color: var(--green);
+}
+
+.role-pill {
+  flex: 0 0 auto;
+  padding: 2px 5px;
+  border-radius: 2px;
+  background: #e8ece3;
+  color: #56705f;
+  font-size: 6.5px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+
+.recent-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.recent-main strong {
+  display: block;
+  overflow: hidden;
+  color: #3f4a42;
+  font-size: 8.5px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.recent-main small {
+  display: block;
+  color: #8a918a;
+  font-size: 7px;
+}
+
+.status-pill {
+  flex: 0 0 auto;
+  color: #8a918a;
+  font-size: 7px;
+  font-weight: 600;
+}
+
+.status-pill.published {
+  color: #3f7a54;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 14px;
+  height: 49px;
+  padding: 0 25px;
+  border-bottom: 1px solid #e4e4dc;
+}
+
+.user-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 10px 4px 4px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+}
+
+.user-avatar {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--green);
+  color: #f6f5eb;
+  font-size: 8.5px;
+  font-weight: 700;
+}
+
+.user-name {
+  color: #3f4a42;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.user-role {
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: #e5ebde;
+  color: #4d6a57;
+  font-size: 8.5px;
+  font-weight: 600;
+}
+
+.signout-btn {
+  padding: 5px 10px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  background: none;
+  color: #6b7a70;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.signout-btn:hover {
+  border-color: var(--line);
+  background: var(--surface);
+  color: var(--ink);
+}
+
 @media (min-width: 1400px) {
   .dashboard-content {
     padding-top: 25px;

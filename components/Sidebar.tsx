@@ -1,16 +1,7 @@
 import Link from "next/link";
-import { createAdminClient } from "@/lib/supabase/admin";
 import { ArchiveIcon } from "./ArchiveIcon";
 import SidebarNav from "./SidebarNav";
-
-async function getCounts() {
-  const sb = createAdminClient();
-  const tables = ["biographies", "players", "coaches", "clubs", "national_teams", "countries", "sources"];
-  const results = await Promise.all(
-    tables.map((t) => sb.from(t).select("*", { count: "exact", head: true }))
-  );
-  return Object.fromEntries(tables.map((t, i) => [t, results[i].count ?? 0]));
-}
+import { getCounts } from "@/lib/db/counts";
 
 export async function Sidebar() {
   const counts = await getCounts();

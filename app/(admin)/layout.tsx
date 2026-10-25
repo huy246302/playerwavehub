@@ -10,6 +10,13 @@ async function signOut() {
   redirect("/login");
 }
 
+const ROLE_LABEL: Record<string, string> = { admin: "Administrator", editor: "Editor" };
+
+function initials(name: string) {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  return ((parts[0]?.[0] ?? "?") + (parts.length > 1 ? parts[parts.length - 1][0] : "")).toUpperCase();
+}
+
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -21,17 +28,22 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     .eq("id", user.id)
     .single();
 
+  const name = profile?.display_name ?? user.email ?? "User";
+
   return (
-    <div className="flex min-h-screen">
+    <div className="app-layout">
       <Sidebar />
-      <div className="flex-1 bg-[#f6f4ee]">
-        <header className="flex items-center justify-end gap-3 px-8 py-3 text-sm text-neutral-600">
-          <span>
-            {profile?.display_name ?? user.email}
-            {profile?.role && <span className="ml-2 rounded bg-neutral-200 px-1.5 py-0.5 text-xs">{profile.role}</span>}
-          </span>
+      <div className="main-column">
+        <header className="topbar">
+          <div className="user-chip">
+            <span className="user-avatar" aria-hidden>{initials(name)}</span>
+            <span className="user-name">{name}</span>
+            {profile?.role && (
+              <span className="user-role">{ROLE_LABEL[profile.role] ?? profile.role}</span>
+            )}
+          </div>
           <form action={signOut}>
-            <button className="underline">Sign out</button>
+            <button className="signout-btn">Sign out</button>
           </form>
         </header>
         <main className="p-8">{children}</main>

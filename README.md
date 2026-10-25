@@ -35,7 +35,6 @@ The easiest way to deploy your Next.js app is to use the [Vercel Platform](https
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
 
-
 ```
 playerwavehub
 ├─ app
@@ -59,7 +58,21 @@ playerwavehub
 │  │  │     │  └─ page.tsx
 │  │  │     └─ page.tsx
 │  │  ├─ head-coach
-│  │  │  └─ page.tsx
+│  │  │  ├─ new
+│  │  │  │  └─ page.tsx
+│  │  │  ├─ page.tsx
+│  │  │  └─ [id]
+│  │  │     ├─ attributes
+│  │  │     │  └─ page.tsx
+│  │  │     ├─ edit
+│  │  │     │  └─ page.tsx
+│  │  │     ├─ hidden-attributes
+│  │  │     │  └─ page.tsx
+│  │  │     ├─ page.tsx
+│  │  │     ├─ sources
+│  │  │     │  └─ page.tsx
+│  │  │     └─ stints
+│  │  │        └─ page.tsx
 │  │  ├─ layout.tsx
 │  │  ├─ national-teams
 │  │  │  ├─ new
@@ -70,22 +83,30 @@ playerwavehub
 │  │  │     │  └─ page.tsx
 │  │  │     └─ page.tsx
 │  │  ├─ page.tsx
-│  │  └─ players
+│  │  ├─ players
+│  │  │  ├─ new
+│  │  │  │  └─ page.tsx
+│  │  │  ├─ page.tsx
+│  │  │  └─ [id]
+│  │  │     ├─ attributes
+│  │  │     │  └─ page.tsx
+│  │  │     ├─ edit
+│  │  │     │  └─ page.tsx
+│  │  │     ├─ hidden-attributes
+│  │  │     │  └─ page.tsx
+│  │  │     ├─ page.tsx
+│  │  │     ├─ sources
+│  │  │     │  └─ page.tsx
+│  │  │     └─ stints
+│  │  │        └─ page.tsx
+│  │  └─ sources
 │  │     ├─ new
 │  │     │  └─ page.tsx
 │  │     ├─ page.tsx
 │  │     └─ [id]
-│  │        ├─ attriubtes
-│  │        │  └─ page.tsx
 │  │        ├─ edit
 │  │        │  └─ page.tsx
-│  │        ├─ hidden-attributes
-│  │        │  └─ page.tsx
-│  │        ├─ page.tsx
-│  │        ├─ sources
-│  │        │  └─ page.tsx
-│  │        └─ stints
-│  │           └─ page.tsx
+│  │        └─ page.tsx
 │  ├─ favicon.ico
 │  ├─ globals.css
 │  ├─ layout.tsx
@@ -101,17 +122,30 @@ playerwavehub
 │  ├─ clubs
 │  │  └─ ClubForm.tsx
 │  ├─ coaches
-│  │  ├─ CoachesForm.tsx
-│  │  └─ CoachesTable.tsx
+│  │  ├─ AttributesForm.tsx
+│  │  ├─ CoachesTable.tsx
+│  │  ├─ CoachForm.tsx
+│  │  ├─ HiddenAttributesForm.tsx
+│  │  └─ stints
+│  │     ├─ ClubStintsCard.tsx
+│  │     └─ NationalStintsCard.tsx
 │  ├─ countries
 │  │  └─ CountryForm.tsx
 │  ├─ national-teams
 │  │  └─ NationalTeamForm.tsx
 │  ├─ players
 │  │  ├─ AttributesForm.tsx
-│  │  └─ PlayerForm.tsx
+│  │  ├─ HiddenAttributesForm.tsx
+│  │  ├─ PlayerForm.tsx
+│  │  ├─ PositionsFeetCard.tsx
+│  │  └─ stints
+│  │     ├─ ClubStintsCard.tsx
+│  │     └─ NationalStintsCard.tsx
 │  ├─ Sidebar.tsx
 │  ├─ SidebarNav.tsx
+│  ├─ sources
+│  │  ├─ SourceForm.tsx
+│  │  └─ SourceLinker.tsx
 │  └─ ui
 │     ├─ DeleteRecordButton.tsx
 │     ├─ DetailTabs.tsx
@@ -121,21 +155,38 @@ playerwavehub
 ├─ lib
 │  ├─ actions
 │  │  ├─ biographies.ts
+│  │  ├─ biography-sources.ts
+│  │  ├─ club-sources.ts
 │  │  ├─ clubs.ts
+│  │  ├─ coach-attributes.ts
+│  │  ├─ coach-stints.ts
 │  │  ├─ coach.ts
 │  │  ├─ countries.ts
 │  │  ├─ national-teams.ts
 │  │  ├─ player-attributes.ts
-│  │  └─ players.ts
+│  │  ├─ player-hidden-attributes.ts
+│  │  ├─ player-positions.ts
+│  │  ├─ player-stints.ts
+│  │  ├─ players.ts
+│  │  └─ sources.ts
 │  ├─ auth.ts
 │  ├─ biographies.ts
 │  ├─ db
+│  │  ├─ biography-sources.ts
+│  │  ├─ club-sources.ts
 │  │  ├─ clubs.ts
+│  │  ├─ coach-attributes.ts
+│  │  ├─ coach-stints.ts
 │  │  ├─ coach.ts
 │  │  ├─ countries.ts
 │  │  ├─ national-teams.ts
 │  │  ├─ player-attributes.ts
+│  │  ├─ player-feet.ts
+│  │  ├─ player-hidden-attributes.ts
+│  │  ├─ player-positions.ts
+│  │  ├─ player-stints.ts
 │  │  ├─ players.ts
+│  │  ├─ sources.ts
 │  │  └─ util.ts
 │  ├─ form-state.ts
 │  ├─ slug.ts
@@ -143,14 +194,22 @@ playerwavehub
 │  │  ├─ admin.ts
 │  │  └─ server.ts
 │  └─ validation
+│     ├─ biography.ts
 │     ├─ club.ts
+│     ├─ coach-attributes.ts
+│     ├─ coach-hidden-attributes.ts
+│     ├─ coach-stints.ts
 │     ├─ coach.ts
 │     ├─ common.ts
 │     ├─ country.ts
 │     ├─ national-team.ts
-│     ├─ person.ts
 │     ├─ player-attributes.ts
-│     └─ player.ts
+│     ├─ player-hidden-attributes.ts
+│     ├─ player.ts
+│     ├─ position.ts
+│     ├─ source-link.ts
+│     ├─ source.ts
+│     └─ stints.ts
 ├─ next.config.ts
 ├─ package-lock.json
 ├─ package.json
