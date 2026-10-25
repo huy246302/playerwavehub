@@ -6,12 +6,20 @@ import DeleteRecordButton from "@/components/ui/DeleteRecordButton";
 import {
   Breadcrumbs, Card, DefList, PageHeader, Thumb, fmtDateTime, primaryBtn,
 } from "@/components/ui/kit";
+import { listClubSources } from "@/lib/db/club-sources";
+import { listSourceOptions } from "@/lib/db/sources";
+import { linkClubSource, unlinkClubSource } from "@/lib/actions/club-sources";
+import SourceLinker from "@/components/sources/SourceLinker";
 
 export default async function ClubPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const num = Number(id);
   if (!Number.isInteger(num)) notFound();
-  const club = await getClub(num);
+  const [club, linkedSources, sourceOptions] = await Promise.all([
+    getClub(num),
+    listClubSources(num),
+    listSourceOptions(),
+  ]);
   if (!club) notFound();
 
   return (
@@ -82,6 +90,13 @@ export default async function ClubPage({ params }: { params: Promise<{ id: strin
           </Card>
         </aside>
       </div>
+      <SourceLinker
+        title="Sources"
+        linked={linkedSources}
+        options={sourceOptions}
+        linkAction={linkClubSource.bind(null, club.id)}
+        unlinkAction={unlinkClubSource.bind(null, club.id)}
+      />
 
       <Link href="/clubs" className="inline-block text-sm text-neutral-500 hover:underline">← Back to clubs</Link>
     </div>
