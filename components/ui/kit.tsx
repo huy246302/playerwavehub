@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 export const inputCls =
   "w-full rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm outline-none placeholder:text-neutral-400 focus:border-[#254a39] focus:ring-2 focus:ring-[#254a39]/15";
 export const primaryBtn =
-  "inline-flex items-center rounded-md bg-[#47d392] px-4 py-2 text-sm font-medium text-white hover:bg-[#1d3b2e] disabled:opacity-60";
+  "inline-flex items-center rounded-md bg-[#285a45] px-4 py-2 text-sm font-medium text-white hover:bg-[#1d3b2e] disabled:opacity-60";
 export const ghostBtn =
   "inline-flex items-center rounded-md border border-neutral-300 bg-white px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-50";
 

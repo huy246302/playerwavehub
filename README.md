@@ -40,7 +40,13 @@ playerwavehub
 ├─ app
 │  ├─ (admin)
 │  │  ├─ biographies
-│  │  │  └─ page.tsx
+│  │  │  ├─ new
+│  │  │  │  └─ page.tsx
+│  │  │  ├─ page.tsx
+│  │  │  └─ [id]
+│  │  │     ├─ edit
+│  │  │     │  └─ page.tsx
+│  │  │     └─ page.tsx
 │  │  ├─ clubs
 │  │  │  ├─ new
 │  │  │  │  └─ page.tsx
@@ -107,8 +113,8 @@ playerwavehub
 │  │        ├─ edit
 │  │        │  └─ page.tsx
 │  │        └─ page.tsx
-│  ├─ favicon.ico
 │  ├─ globals.css
+│  ├─ icon.svg
 │  ├─ layout.tsx
 │  └─ login
 │     ├─ action.ts
@@ -117,8 +123,7 @@ playerwavehub
 ├─ components
 │  ├─ ArchiveIcon.tsx
 │  ├─ biographies
-│  │  ├─ BiographiesForm.tsx
-│  │  └─ DeletePersonButton.tsx
+│  │  └─ BiographyForm.tsx
 │  ├─ clubs
 │  │  └─ ClubForm.tsx
 │  ├─ coaches
@@ -172,6 +177,7 @@ playerwavehub
 │  ├─ auth.ts
 │  ├─ biographies.ts
 │  ├─ db
+│  │  ├─ biographies.ts
 │  │  ├─ biography-sources.ts
 │  │  ├─ club-sources.ts
 │  │  ├─ clubs.ts
@@ -179,6 +185,7 @@ playerwavehub
 │  │  ├─ coach-stints.ts
 │  │  ├─ coach.ts
 │  │  ├─ countries.ts
+│  │  ├─ counts.ts
 │  │  ├─ national-teams.ts
 │  │  ├─ player-attributes.ts
 │  │  ├─ player-feet.ts

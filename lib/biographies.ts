@@ -11,7 +11,13 @@ export type PersonInput = {
   date_of_birth?: string;
   date_of_death?: string;
   birthplace?: string;
+  birth_country_id?: number;
+  nationality_id?: number;
   bio?: string;
+  photo_url?: string;
+  photo_credit?: string;
+  photo_license?: string;
+  photo_source_url?: string;
 };
 
 export async function insertPerson(
@@ -33,7 +39,13 @@ export async function insertPerson(
         date_of_birth: input.date_of_birth ?? null,
         date_of_death: input.date_of_death ?? null,
         birthplace: input.birthplace ?? null,
+        birth_country_id: input.birth_country_id ?? null,
+        nationality_id: input.nationality_id ?? null,
         bio: input.bio ?? null,
+        photo_url: input.photo_url ?? null,
+        photo_credit: input.photo_credit ?? null,
+        photo_license: input.photo_license ?? null,
+        photo_source_url: input.photo_source_url ?? null,
         created_by: userId,
         updated_by: userId,
       })
