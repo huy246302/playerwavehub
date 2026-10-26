@@ -3,7 +3,7 @@ import { useActionState } from "react";
 import Link from "next/link";
 import { createPlayer, updatePlayer } from "@/lib/actions/players";
 import type { FormState } from "@/lib/form-state";
-import { Card, DefList, Field, fmtDateTime, ghostBtn, inputCls, primaryBtn } from "@/components/ui/kit";
+import { Card, DefList, Field, clampDigits, fmtDateTime, ghostBtn, inputCls, primaryBtn } from "@/components/ui/kit";
 
 type Player = {
   id: number; biography_id: number; career_start_year: number | null; retired_year: number | null;
@@ -24,6 +24,7 @@ export default function PlayerForm({
   const val = (k: string, fallback?: string | null) => state.values?.[k] ?? fallback ?? "";
   const biographyId = state.values?.biography_id ?? (player?.biography_id ? String(player.biography_id) : "");
   const status = state.values?.status ?? (player?.is_published ? "published" : "draft");
+  const thisYear = new Date().getFullYear();
 
   return (
     <form action={action} className="space-y-6">
@@ -54,24 +55,29 @@ export default function PlayerForm({
               </>
             )}
           </Card>
-
           <Card title="Career & legacy" note="Optional">
             <div className="grid gap-4 sm:grid-cols-2">
               <Field label="Career start year" error={err("career_start_year")}>
-                <input name="career_start_year" inputMode="numeric" placeholder="YYYY" className={inputCls}
+                <input name="career_start_year" type="number" inputMode="numeric"
+                  min={1850} max={thisYear} placeholder="YYYY" className={inputCls}
+                  onInput={clampDigits(4, thisYear)}
                   defaultValue={val("career_start_year", player?.career_start_year ? String(player.career_start_year) : undefined)} />
               </Field>
               <Field label="Retired year" error={err("retired_year")}>
-                <input name="retired_year" inputMode="numeric" placeholder="YYYY" className={inputCls}
+                <input name="retired_year" type="number" inputMode="numeric"
+                  min={1850} max={thisYear} placeholder="YYYY" className={inputCls}
+                  onInput={clampDigits(4, thisYear)}
                   defaultValue={val("retired_year", player?.retired_year ? String(player.retired_year) : undefined)} />
               </Field>
             </div>
             <p className="mt-1 text-xs text-neutral-400">
-              Use four-digit years. Retired year must be equal to or later than career start year when both are entered.
+              Use four-digit years, no later than {thisYear}. Retired year must be equal to or later than career start year when both are entered.
             </p>
             <div className="mt-4">
               <Field label="Height (cm)" error={err("height_cm")} hint="Optional · Enter a value from 120 to 230 cm.">
-                <input name="height_cm" inputMode="numeric" placeholder="Enter height" className={inputCls}
+                <input name="height_cm" type="number" inputMode="numeric"
+                  min={120} max={230} placeholder="e.g. 175" className={inputCls}
+                  onInput={clampDigits(3, 230)}
                   defaultValue={val("height_cm", player?.height_cm ? String(player.height_cm) : undefined)} />
               </Field>
             </div>
