@@ -5,7 +5,8 @@ import Link from "next/link";
 import { createNationalStint, updateNationalStint, deleteNationalStint } from "@/lib/actions/player-stints";
 import type { NationalStint } from "@/lib/db/player-stints";
 import type { FormState } from "@/lib/form-state";
-import { Card, clampDigits , ghostBtn, inputCls, primaryBtn } from "@/components/ui/kit";
+import { Card, clampDigits ,fmtDate , ghostBtn, inputCls, primaryBtn } from "@/components/ui/kit";
+import DateInput from "@/components/ui/DateInput";
 
 function StintFields({ state, defaults }: { state: FormState; defaults?: Partial<NationalStint> }) {
   const err = (k: string) => state.errors?.[k]?.[0];
@@ -14,12 +15,12 @@ function StintFields({ state, defaults }: { state: FormState; defaults?: Partial
     <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
       <div>
         <label className="mb-1 block text-xs font-medium text-neutral-600">Debut date</label>
-        <input name="debut_date" type="date" className={inputCls} defaultValue={val("debut_date", defaults?.debut_date ?? undefined)} />
+        <DateInput name="debut_date" defaultValue={val("debut_date", defaults?.debut_date ?? undefined)} />
         {err("debut_date") && <p className="mt-1 text-xs text-red-600">{err("debut_date")}</p>}
       </div>
       <div>
         <label className="mb-1 block text-xs font-medium text-neutral-600">Last cap date</label>
-        <input name="last_cap_date" type="date" className={inputCls} defaultValue={val("last_cap_date", defaults?.last_cap_date ?? undefined)} />
+        <DateInput name="last_cap_date" defaultValue={val("last_cap_date", defaults?.last_cap_date ?? undefined)} />
         {err("last_cap_date") && <p className="mt-1 text-xs text-red-600">{err("last_cap_date")}</p>}
       </div>
       <div>
@@ -115,7 +116,11 @@ export default function NationalStintsCard({
             <div key={s.id} className="flex items-center justify-between rounded-md border border-neutral-200 px-3 py-2 text-sm">
               <span>
                 <span className="font-medium">{s.team?.name ?? "—"}</span>
-                {s.debut_date && <span className="ml-2 text-neutral-500">{s.debut_date}–{s.last_cap_date ?? "present"}</span>}
+                {s.debut_date && (
+                  <span className="ml-2 text-neutral-500">
+                    {fmtDate(s.debut_date)} – {s.last_cap_date ? fmtDate(s.last_cap_date) : "present"}
+                  </span>
+                )}
                 {(s.caps != null || s.goals != null) && (
                   <span className="ml-2 text-neutral-500">{s.caps ?? "—"} caps · {s.goals ?? "—"} goals</span>
                 )}

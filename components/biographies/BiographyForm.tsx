@@ -5,6 +5,7 @@ import { createBiography, updateBiography } from "@/lib/actions/biographies";
 import type { FormState } from "@/lib/form-state";
 import type { Biography } from "@/lib/db/biographies";
 import { Card, DefList, Field, fmtDateTime, ghostBtn, inputCls, primaryBtn } from "@/components/ui/kit";
+import DateInput from "@/components/ui/DateInput";
 
 export default function BiographyForm({
   biography, countries,
@@ -45,12 +46,10 @@ export default function BiographyForm({
                   defaultValue={val("display_name", biography?.display_name)} />
               </Field>
               <Field label="Date of birth" error={err("date_of_birth")}>
-                <input type="date" name="date_of_birth" className={inputCls}
-                  defaultValue={val("date_of_birth", biography?.date_of_birth)} />
+                <DateInput name="date_of_birth" defaultValue={val("date_of_birth", biography?.date_of_birth)} />
               </Field>
               <Field label="Date of death" error={err("date_of_death")} hint="Leave empty if still living.">
-                <input type="date" name="date_of_death" className={inputCls}
-                  defaultValue={val("date_of_death", biography?.date_of_death)} />
+                <DateInput name="date_of_death" defaultValue={val("date_of_death", biography?.date_of_death)} />
               </Field>
               <Field label="Birthplace" error={err("birthplace")} hint="City or town.">
                 <input name="birthplace" className={inputCls}

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { createSource, updateSource } from "@/lib/actions/sources";
 import type { FormState } from "@/lib/form-state";
 import { Card, DefList, Field, fmtDateTime, ghostBtn, inputCls, primaryBtn } from "@/components/ui/kit";
+import DateInput from "@/components/ui/DateInput";
 
 type Source = {
   id: number; title: string; url: string | null; publisher: string | null; author: string | null;
@@ -42,10 +43,10 @@ export default function SourceForm({ source }: { source?: Source | null }) {
                 <input name="author" className={inputCls} defaultValue={val("author", source?.author)} />
               </Field>
               <Field label="Published on" error={err("published_on")}>
-                <input name="published_on" type="date" className={inputCls} defaultValue={val("published_on", source?.published_on)} />
+                <DateInput name="published_on" defaultValue={val("published_on", source?.published_on)} />
               </Field>
               <Field label="Accessed on" error={err("accessed_on")} hint="When you last verified this source.">
-                <input name="accessed_on" type="date" className={inputCls} defaultValue={val("accessed_on", source?.accessed_on)} />
+                <DateInput name="accessed_on" defaultValue={val("accessed_on", source?.accessed_on)} />
               </Field>
             </div>
           </Card>

@@ -10,11 +10,16 @@ export const ghostBtn =
 
 // fixed locale + UTC so server and browser print identical text
 export const fmtDate = (d?: string | null) =>
-  d ? new Date(d).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric", timeZone: "UTC" }) : "—";
+  d
+    ? new Date(d).toLocaleDateString("en-GB", {
+        day: "2-digit", month: "2-digit", year: "numeric", timeZone: "UTC",
+      })
+    : "—";
 export const fmtDateTime = (d?: string | null) =>
   d
     ? new Date(d).toLocaleString("en-GB", {
-        day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit", timeZone: "UTC",
+        day: "2-digit", month: "2-digit", year: "numeric",
+        hour: "2-digit", minute: "2-digit", timeZone: "UTC",
       }) + " UTC"
     : "—";
 
