@@ -7,9 +7,9 @@ export async function Sidebar() {
   const counts = await getCounts();
 
   return (
-    <aside className="sidebar">
-      <Link href="/" className="archive-brand">
-        <span className="brand-mark">F</span>
+    <aside className="sb">
+      <Link href="/" className="sb-brand">
+        <span className="sb-mark">F</span>
         <span>
           <strong>Football Legends</strong>
           <small>ARCHIVE</small>
@@ -18,8 +18,8 @@ export async function Sidebar() {
 
       <SidebarNav counts={counts} />
 
-      <div className="sidebar-spacer" />
-      <section className="sidebar-note">
+      <div className="sb-spacer" />
+      <section className="sb-note">
         <ArchiveIcon name="book" />
         <h2>The game remembered.<br />One story at a time.</h2>
         <p>A home for football&apos;s biographies, places and history.</p>
