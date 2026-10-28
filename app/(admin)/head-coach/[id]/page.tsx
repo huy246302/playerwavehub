@@ -4,6 +4,7 @@ import { getCoach } from "@/lib/db/coach";
 import { deleteCoaches } from "@/lib/actions/coach";
 import DeleteRecordButton from "@/components/ui/DeleteRecordButton";
 import { DetailTabs } from "@/components/ui/DetailTabs";
+import NationalityTag from "@/components/ui/NationalityTag";
 import { Breadcrumbs, Card, DefList, PageHeader, fmtDateTime, primaryBtn } from "@/components/ui/kit";
 
 const TABS = [
@@ -19,6 +20,7 @@ export default async function CoachPage({ params }: { params: Promise<{ id: stri
   const coach = await getCoach(num);
   if (!coach) notFound();
   const basePath = `/head-coach/${coach.id}`;
+  const bioPath = `/biographies/${coach.biography_id}`;
 
   return (
     <div className="space-y-6">
@@ -39,7 +41,11 @@ export default async function CoachPage({ params }: { params: Promise<{ id: stri
       <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
         <div className="space-y-6">
           <Card title="Career & legacy" note={`Coach #${coach.id}`}>
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid gap-4 sm:grid-cols-3">
+              <div>
+                <p className="text-xs text-neutral-500">Nationality</p>
+                <p className="text-lg"><NationalityTag nationality={coach.person?.nationality} /></p>
+              </div>
               <div><p className="text-xs text-neutral-500">Career</p><p className="text-lg">{coach.career_start_year ?? "?"}–{coach.retired_year ?? "present"}</p></div>
               <div><p className="text-xs text-neutral-500">Career status</p><p className="text-lg">{coach.retired_year ? "Retired" : "Active"}</p></div>
             </div>
@@ -92,14 +98,17 @@ export default async function CoachPage({ params }: { params: Promise<{ id: stri
           <Card title="Linked biography">
             <p className="text-sm font-medium">{coach.person?.full_name}</p>
             <p className="text-xs text-neutral-500">Biography #{coach.biography_id}</p>
-            <Link href="/biographies" className="mt-2 inline-block text-sm text-[#254a39] underline">View biography →</Link>
+            <Link href={bioPath} className="mt-2 inline-block text-sm text-[#254a39] underline">View biography →</Link>
+            <p className="mt-2 text-xs text-neutral-400">
+              Nationality is set on the biography. Change it from Edit biography.
+            </p>
           </Card>
 
           <Card title="Source connections" note={`${coach.sourceCount} sources`}>
             <p className="text-sm text-neutral-500">
               {coach.sourceCount ? `${coach.sourceCount} source(s) linked to Biography #${coach.biography_id}.` : `No sources are linked to Biography #${coach.biography_id} yet.`}
             </p>
-            <Link href="/biographies" className="mt-2 inline-block text-xs text-[#254a39] underline">Manage biography sources →</Link>
+            <Link href={`${basePath}/sources`} className="mt-2 inline-block text-xs text-[#254a39] underline">Manage biography sources →</Link>
           </Card>
 
           <Card title="Record history" note="Read only">

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { listPlayers, statusCounts } from "@/lib/db/players";
 import { deletePlayers } from "@/lib/actions/players";
 import RecordTable from "@/components/ui/RecordTable";
+import NationalityTag from "@/components/ui/NationalityTag";
 import { Breadcrumbs, PageHeader, Pager, fmtDate, inputCls, ghostBtn, primaryBtn } from "@/components/ui/kit";
 
 type SP = Record<string, string | undefined>;
@@ -48,6 +49,9 @@ export default async function PlayersPage({ searchParams }: { searchParams: Prom
         <span className="font-medium">{r.person?.full_name ?? "—"}</span>
         <br /><span className="text-xs text-neutral-400">Biography #{r.person?.id ?? "—"}</span>
       </Link>,
+      <span key="nat" className="text-neutral-600">
+        <NationalityTag nationality={r.person?.nationality} />
+      </span>,
       <span key="c" className="text-neutral-600">{r.career_start_year ?? "?"}–{r.retired_year ?? "present"}</span>,
       <span key="h" className="text-neutral-600">{r.height_cm ? `${r.height_cm} cm` : "—"}</span>,
       <span key="l" className="block max-w-xs truncate text-neutral-600">{r.legacy_summary ?? "—"}</span>,
@@ -75,10 +79,10 @@ export default async function PlayersPage({ searchParams }: { searchParams: Prom
 
         <form method="get" className="flex flex-wrap gap-2 border-b border-neutral-200 p-4">
           {status && <input type="hidden" name="status" value={status} />}
-          <input name="q" defaultValue={sp.q} placeholder="Search linked biography or legacy summary…" className={`${inputCls} min-w-56 flex-1`} />
-          <input name="from" defaultValue={sp.from} inputMode="numeric" placeholder="Career from" className={`${inputCls} w-32`} />
-          <input name="to" defaultValue={sp.to} inputMode="numeric" placeholder="Retired by" className={`${inputCls} w-32`} />
-          <select name="height" defaultValue={heightBand} className={`${inputCls} w-auto`}>
+          <input name="q" defaultValue={sp.q} placeholder="Search by player name…" className={`${inputCls} w-auto! min-w-56 flex-1`} />
+          <input name="from" defaultValue={sp.from} inputMode="numeric" placeholder="Career from" className={`${inputCls} w-32!`} />
+          <input name="to" defaultValue={sp.to} inputMode="numeric" placeholder="Retired by" className={`${inputCls} w-32!`} />
+          <select name="height" defaultValue={heightBand} className={`${inputCls} w-auto!`}>
             <option value="">Height: Any</option>
             <option value="lt170">Under 170 cm</option>
             <option value="170-179">170–179 cm</option>
@@ -91,7 +95,7 @@ export default async function PlayersPage({ searchParams }: { searchParams: Prom
 
         <RecordTable
           basePath="/players" noun="player"
-          headers={["Player / Biography", "Career", "Height", "Legacy summary", "Status", "Updated"]}
+          headers={["Player / Biography", "Nationality", "Career", "Height", "Legacy summary", "Status", "Updated"]}
           rows={tableRows}
           deleteAction={deletePlayers}
           emptyTitle="No players yet"

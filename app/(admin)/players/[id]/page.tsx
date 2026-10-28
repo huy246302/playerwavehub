@@ -4,6 +4,7 @@ import { getPlayer } from "@/lib/db/players";
 import { deletePlayers } from "@/lib/actions/players";
 import DeleteRecordButton from "@/components/ui/DeleteRecordButton";
 import { DetailTabs } from "@/components/ui/DetailTabs";
+import NationalityTag from "@/components/ui/NationalityTag";
 import { Breadcrumbs, Card, DefList, PageHeader, fmtDateTime, primaryBtn } from "@/components/ui/kit";
 
 const TABS = [
@@ -21,6 +22,7 @@ export default async function PlayerPage({ params }: { params: Promise<{ id: str
   const player = await getPlayer(num);
   if (!player) notFound();
   const basePath = `/players/${player.id}`;
+  const bioPath = `/biographies/${player.biography_id}`;
 
   return (
     <div className="space-y-6">
@@ -41,7 +43,11 @@ export default async function PlayerPage({ params }: { params: Promise<{ id: str
       <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
         <div className="space-y-6">
           <Card title="Career & legacy" note={`Player #${player.id}`}>
-            <div className="grid gap-4 sm:grid-cols-3">
+            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+              <div>
+                <p className="text-xs text-neutral-500">Nationality</p>
+                <p className="text-lg"><NationalityTag nationality={player.person?.nationality} /></p>
+              </div>
               <div><p className="text-xs text-neutral-500">Career</p><p className="text-lg">{player.career_start_year ?? "?"}–{player.retired_year ?? "present"}</p></div>
               <div><p className="text-xs text-neutral-500">Career status</p><p className="text-lg">{player.retired_year ? "Retired" : "Active"}</p></div>
               <div><p className="text-xs text-neutral-500">Height</p><p className="text-lg">{player.height_cm ? `${player.height_cm} cm` : "—"}</p></div>
@@ -104,14 +110,17 @@ export default async function PlayerPage({ params }: { params: Promise<{ id: str
           <Card title="Linked biography">
             <p className="text-sm font-medium">{player.person?.full_name}</p>
             <p className="text-xs text-neutral-500">Biography #{player.biography_id}</p>
-            <Link href="/biographies" className="mt-2 inline-block text-sm text-[#254a39] underline">View biography →</Link>
+            <Link href={bioPath} className="mt-2 inline-block text-sm text-[#254a39] underline">View biography →</Link>
+            <p className="mt-2 text-xs text-neutral-400">
+              Nationality is set on the biography. Change it from Edit biography.
+            </p>
           </Card>
 
           <Card title="Source connections" note={`${player.sourceCount} sources`}>
             <p className="text-sm text-neutral-500">
               {player.sourceCount ? `${player.sourceCount} source(s) linked to Biography #${player.biography_id}.` : `No sources are linked to Biography #${player.biography_id} yet.`}
             </p>
-            <Link href="/biographies" className="mt-2 inline-block text-xs text-[#254a39] underline">Manage biography sources →</Link>
+            <Link href={`${basePath}/sources`} className="mt-2 inline-block text-xs text-[#254a39] underline">Manage biography sources →</Link>
           </Card>
 
           <Card title="Record history" note="Read only">

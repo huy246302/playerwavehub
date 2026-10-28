@@ -1,8 +1,11 @@
 import "server-only";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { fail, one, PAGE_SIZE } from "@/lib/db/util";
+import { fail, PAGE_SIZE } from "@/lib/db/util";
+import type { Nationality } from "@/lib/db/players";
 
-type Person = { id: number; full_name: string; display_name: string | null } | null;
+type Person = {
+  id: number; full_name: string; display_name: string | null; nationality: Nationality;
+} | null;
 
 export type CoachRow = {
   id: number; biography_id: number; legacy_summary: string | null;
@@ -14,8 +17,20 @@ export type CoachFilters = {
   q?: string; status?: "draft" | "published"; from?: number; to?: number; page?: number;
 };
 
+const NATIONALITY = "nationality:countries!nationality_id(id, name, demonym, is_historical)";
+
 const COLS =
-  "id, biography_id, legacy_summary, career_start_year, retired_year, is_published, updated_at, updated_by, person:biographies!inner(id, full_name, display_name)";
+  `id, biography_id, legacy_summary, career_start_year, retired_year, is_published, updated_at, updated_by, person:biographies!inner(id, full_name, display_name, ${NATIONALITY})`;
+
+const first = <T,>(v: T | T[] | null | undefined): T | null =>
+  Array.isArray(v) ? v[0] ?? null : v ?? null;
+
+// PostgREST may return embedded rows as an object or a one-item array; normalise both levels
+function normPerson(raw: unknown): Person {
+  const p = first(raw as Record<string, unknown> | Record<string, unknown>[] | null);
+  if (!p) return null;
+  return { ...(p as object), nationality: first(p.nationality as Nationality | Nationality[]) } as Person;
+}
 
 async function profileNames(ids: (string | null)[]) {
   const unique = [...new Set(ids.filter(Boolean))] as string[];
@@ -43,7 +58,7 @@ export async function listCoaches(f: CoachFilters) {
   const names = await profileNames((data ?? []).map((r) => r.updated_by));
   const rows: CoachRow[] = (data ?? []).map((r) => ({
     ...r,
-    person: one(r.person as Person | Person[]),
+    person: normPerson(r.person),
     updated_by_name: r.updated_by ? names.get(r.updated_by) ?? null : null,
   }));
   return { rows, total: count ?? 0, pageSize: PAGE_SIZE, page };
@@ -63,7 +78,8 @@ export async function coachStatusCounts() {
 export async function getCoach(id: number) {
   const sb = createAdminClient();
   const { data, error } = await sb.from("coaches")
-    .select("*, person:biographies(id, full_name, display_name)").eq("id", id).maybeSingle();
+    .select(`*, person:biographies(id, full_name, display_name, ${NATIONALITY})`)
+    .eq("id", id).maybeSingle();
   if (error) throw fail(error);
   if (!data) return null;
 
@@ -79,7 +95,7 @@ export async function getCoach(id: number) {
 
   return {
     ...data,
-    person: one(data.person as Person | Person[]),
+    person: normPerson(data.person),
     created_by_name: data.created_by ? names.get(data.created_by) ?? null : null,
     updated_by_name: data.updated_by ? names.get(data.updated_by) ?? null : null,
     hasAttributes: (attrs.count ?? 0) > 0,
