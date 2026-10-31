@@ -4,17 +4,18 @@ import Link from "next/link";
 import { createPlayer, updatePlayer } from "@/lib/actions/players";
 import type { FormState } from "@/lib/form-state";
 import { Card, DefList, Field, clampDigits, fmtDateTime, ghostBtn, inputCls, primaryBtn } from "@/components/ui/kit";
+import { biographyLabel } from "@/lib/names";
 
 type Player = {
   id: number; biography_id: number; career_start_year: number | null; retired_year: number | null;
   height_cm: number | null; legacy_summary: string | null; is_published: boolean; created_at: string;
-  person: { id: number; full_name: string } | null;
+  person: { id: number; full_name: string; display_name?: string | null } | null;
   created_by_name: string | null; updated_by_name: string | null;
 };
 
 export default function PlayerForm({
   player, biographies,
-}: { player?: Player | null; biographies: { id: number; full_name: string }[] }) {
+}: { player?: Player | null; biographies: { id: number; full_name: string; display_name?: string | null }[] }) {
   const editing = !!player;
   const [state, action, pending] = useActionState<FormState, FormData>(
     editing ? updatePlayer.bind(null, player!.id) : createPlayer,
@@ -34,7 +35,7 @@ export default function PlayerForm({
             {editing ? (
               <>
                 <input type="hidden" name="biography_id" value={player!.biography_id} />
-                <div className={`${inputCls} bg-neutral-100`}>{player!.person?.full_name}</div>
+                <div className={`${inputCls} bg-neutral-100`}>{biographyLabel(player!.person)}</div>
                 <p className="mt-1 text-xs text-neutral-400">The linked biography cannot be changed after saving.</p>
               </>
             ) : (
@@ -42,7 +43,7 @@ export default function PlayerForm({
                 <Field label="Linked biography" required error={err("biography_id")}>
                   <select name="biography_id" defaultValue={biographyId} className={inputCls}>
                     <option value="">{biographies.length ? "Select an eligible biography…" : "No eligible biographies"}</option>
-                    {biographies.map((p) => <option key={p.id} value={p.id}>{p.full_name}</option>)}
+                    {biographies.map((p) => <option key={p.id} value={p.id}>{biographyLabel(p)}</option>)}
                   </select>
                 </Field>
                 <p className="mt-1 text-xs text-neutral-400">

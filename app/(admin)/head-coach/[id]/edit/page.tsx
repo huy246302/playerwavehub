@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { getCoach } from "@/lib/db/coach";
 import CoachForm from "@/components/coaches/CoachForm";
 import { Breadcrumbs, PageHeader } from "@/components/ui/kit";
+import { displayName } from "@/lib/names";
 
 export default async function EditCoachPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -14,9 +15,9 @@ export default async function EditCoachPage({ params }: { params: Promise<{ id: 
     <div className="space-y-6">
       <Breadcrumbs items={[
         { label: "Archive", href: "/" }, { label: "Head coaches", href: "/head-coach" },
-        { label: coach.person?.full_name ?? `Coach #${coach.id}`, href: `/head-coach/${coach.id}` }, { label: "Edit" },
+        { label: displayName(coach.person, `Coach #${coach.id}`), href: `/head-coach/${coach.id}` }, { label: "Edit" },
       ]} />
-      <PageHeader title={`Edit ${coach.person?.full_name ?? "head coach"}`} />
+      <PageHeader title={`Edit ${displayName(coach.person, "head coach")}`} />
       <CoachForm coach={coach} biographies={[]} />
     </div>
   );

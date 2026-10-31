@@ -6,6 +6,8 @@ import RecordTable from "@/components/ui/RecordTable";
 import {
   Breadcrumbs, PageHeader, Pager, Thumb, fmtDate, inputCls, ghostBtn, primaryBtn,
 } from "@/components/ui/kit";
+import { clip } from "@/lib/names";
+import ClipText from "@/components/ui/ClipText";
 
 type SP = Record<string, string | undefined>;
 
@@ -36,7 +38,7 @@ export default async function ClubsPage({ searchParams }: { searchParams: Promis
         <span>{c.name}{c.short_name && <span className="ml-1 text-neutral-400">({c.short_name})</span>}</span>
       </Link>,
       <span key="c" className="text-neutral-600">{c.city ?? "—"}</span>,
-      <span key="co" className="text-neutral-600">{c.country?.name ?? "—"}</span>,
+      <span key="co" className="text-neutral-600">{c.country ? <ClipText text={c.country.name} /> : "—"}</span>,
       <span key="f" className="text-neutral-600">{c.founded_year ?? "—"}</span>,
       <span key="u" className="text-neutral-500">{fmtDate(c.updated_at)}</span>,
     ],
@@ -56,7 +58,7 @@ export default async function ClubsPage({ searchParams }: { searchParams: Promis
           <input name="q" defaultValue={sp.q} placeholder="Search by club name…" className={`${inputCls} min-w-56 flex-1`} />
           <select name="country" defaultValue={countryId ? String(countryId) : ""} className={`${inputCls} w-auto`}>
             <option value="">Country: All</option>
-            {countries.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+            {countries.map((c) => <option key={c.id} value={c.id} title={c.name}>{clip(c.name)}</option>)}
           </select>
           <button className={ghostBtn}>Apply</button>
           {(sp.q || countryId) && <Link href="/clubs" className="px-2 py-2 text-sm text-neutral-500 underline">Clear</Link>}

@@ -4,6 +4,7 @@ import { getCoachAttributes } from "@/lib/db/coach-attributes";
 import CoachAttributesForm from "@/components/coaches/AttributesForm";
 import { DetailTabs } from "@/components/ui/DetailTabs";
 import { Breadcrumbs, PageHeader } from "@/components/ui/kit";
+import { displayName } from "@/lib/names";
 
 const TABS = [
   { key: "overview", label: "Overview" }, { key: "attributes", label: "Attributes" },
@@ -23,7 +24,7 @@ export default async function CoachAttributesPage({ params }: { params: Promise<
     <div className="space-y-6">
       <Breadcrumbs items={[
         { label: "Archive", href: "/" }, { label: "Head coaches", href: "/head-coach" },
-        { label: coach.person?.full_name ?? `Coach #${coach.id}`, href: basePath }, { label: "Attributes" },
+        { label: displayName(coach.person, `Coach #${coach.id}`), href: basePath }, { label: "Attributes" },
       ]} />
       <PageHeader title="Coach attributes" description="Coaching, mental and management ratings, 1–100." />
       <DetailTabs basePath={basePath} current="attributes" tabs={TABS} />

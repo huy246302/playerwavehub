@@ -6,6 +6,7 @@ import { createFederation, updateFederation } from "@/lib/actions/federations";
 import { CONFEDERATIONS } from "@/lib/validation/federation";
 import type { FormState } from "@/lib/form-state";
 import { Card, DefList, Field, fmtDateTime, ghostBtn, inputCls, primaryBtn } from "@/components/ui/kit";
+import { clip } from "@/lib/names";
 
 type Federation = {
   id: number; slug: string; name: string; short_name: string | null;
@@ -64,7 +65,7 @@ export default function FederationForm({
                 <select name="country_id" defaultValue={countryId} className={inputCls}>
                   <option value="">{countries.length ? "Select a country…" : "No countries added yet"}</option>
                   {countries.map((c) => (
-                    <option key={c.id} value={c.id}>{c.name}{c.is_historical ? " (historical)" : ""}</option>
+                    <option key={c.id} value={c.id} title={c.name}>{clip(c.name)}{c.is_historical ? " (historical)" : ""}</option>
                   ))}
                 </select>
               </Field>

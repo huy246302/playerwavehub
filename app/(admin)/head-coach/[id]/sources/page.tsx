@@ -6,6 +6,7 @@ import { linkBiographySource, unlinkBiographySource } from "@/lib/actions/biogra
 import SourceLinker from "@/components/sources/SourceLinker";
 import { DetailTabs } from "@/components/ui/DetailTabs";
 import { Breadcrumbs, PageHeader } from "@/components/ui/kit";
+import { displayName } from "@/lib/names";
 
 const TABS = [
   { key: "overview", label: "Overview" }, { key: "attributes", label: "Attributes" },
@@ -30,7 +31,7 @@ export default async function CoachSourcesPage({ params }: { params: Promise<{ i
     <div className="space-y-6">
       <Breadcrumbs items={[
         { label: "Archive", href: "/" }, { label: "Head coaches", href: "/head-coach" },
-        { label: coach.person?.full_name ?? `Coach #${coach.id}`, href: basePath }, { label: "Sources" },
+        { label: displayName(coach.person, `Coach #${coach.id}`), href: basePath }, { label: "Sources" },
       ]} />
       <PageHeader title="Sources" description={`Evidence linked through Biography #${coach.biography_id}.`} />
       <DetailTabs basePath={basePath} current="sources" tabs={TABS} />

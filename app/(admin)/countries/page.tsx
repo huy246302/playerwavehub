@@ -5,6 +5,7 @@ import RecordTable from "@/components/ui/RecordTable";
 import {
   Breadcrumbs, PageHeader, Pager, Thumb, fmtDate, inputCls, ghostBtn, primaryBtn,
 } from "@/components/ui/kit";
+import ClipText from "@/components/ui/ClipText";
 
 type SP = Record<string, string | undefined>;
 
@@ -30,7 +31,7 @@ export default async function CountriesPage({ searchParams }: { searchParams: Pr
     cells: [
       <Link key="n" href={`/countries/${c.id}`} className="flex items-center gap-2 font-medium hover:underline">
         <Thumb src={c.flag_url} className="h-4 w-6 rounded-sm object-cover" />
-        {c.name}
+        <ClipText text={c.name} />
       </Link>,
       <span key="i" className="text-neutral-600">{c.iso_code ?? "—"}</span>,
       <span key="t" className={`rounded-full px-2 py-0.5 text-xs ${c.is_historical ? "bg-amber-100 text-amber-800" : "bg-green-100 text-green-800"}`}>

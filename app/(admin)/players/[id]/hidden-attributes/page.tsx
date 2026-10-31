@@ -4,6 +4,7 @@ import { getPlayerHiddenAttributes } from "@/lib/db/player-hidden-attributes";
 import HiddenAttributesForm from "@/components/players/HiddenAttributesForm";
 import { DetailTabs } from "@/components/ui/DetailTabs";
 import { Breadcrumbs, PageHeader } from "@/components/ui/kit";
+import { displayName } from "@/lib/names";
 
 const TABS = [
   { key: "overview", label: "Overview" }, { key: "attributes", label: "Attributes" },
@@ -23,7 +24,7 @@ export default async function PlayerHiddenAttributesPage({ params }: { params: P
     <div className="space-y-6">
       <Breadcrumbs items={[
         { label: "Archive", href: "/" }, { label: "Players", href: "/players" },
-        { label: player.person?.full_name ?? `Player #${player.id}`, href: basePath }, { label: "Hidden attributes" },
+        { label: displayName(player.person, `Player #${player.id}`), href: basePath }, { label: "Hidden attributes" },
       ]} />
       <PageHeader title="Hidden attributes" description="Managed separately from published content." />
       <DetailTabs basePath={basePath} current="hidden-attributes" tabs={TABS} />

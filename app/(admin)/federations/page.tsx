@@ -6,6 +6,8 @@ import RecordTable from "@/components/ui/RecordTable";
 import {
   Breadcrumbs, PageHeader, Pager, Thumb, fmtDate, inputCls, ghostBtn, primaryBtn,
 } from "@/components/ui/kit";
+import { clip } from "@/lib/names";
+import ClipText from "@/components/ui/ClipText";
 
 type SP = Record<string, string | undefined>;
 
@@ -44,7 +46,7 @@ export default async function FederationsPage({ searchParams }: { searchParams: 
         <Thumb src={f.logo_url} className="h-6 w-6 rounded-full border border-neutral-200 object-cover" />
         <span>{f.name}{f.short_name && <span className="ml-1 text-neutral-400">({f.short_name})</span>}</span>
       </Link>,
-      <span key="co" className="text-neutral-600">{f.country?.name ?? "—"}</span>,
+      <span key="co" className="text-neutral-600">{f.country ? <ClipText text={f.country.name} /> : "—"}</span>,
       <span key="cf" className="text-neutral-600">{f.confederation ?? "—"}</span>,
       <span key="y" className="text-neutral-600">{f.founded_year}–{f.ended_year ?? "present"}</span>,
       <span key="s" className={`rounded-full px-2 py-0.5 text-xs ${f.ended_year != null ? "bg-neutral-200 text-neutral-700" : "bg-green-100 text-green-800"}`}>
@@ -75,7 +77,7 @@ export default async function FederationsPage({ searchParams }: { searchParams: 
           <input name="q" defaultValue={sp.q} placeholder="Search by federation name…" className={`${inputCls} min-w-56 flex-1`} />
           <select name="country" defaultValue={countryId ? String(countryId) : ""} className={`${inputCls} w-auto`}>
             <option value="">Country: All</option>
-            {countries.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+            {countries.map((c) => <option key={c.id} value={c.id} title={c.name}>{clip(c.name)}</option>)}
           </select>
           <button className={ghostBtn}>Apply</button>
           {(sp.q || countryId) && <Link href={qs({ status })} className="px-2 py-2 text-sm text-neutral-500 underline">Clear</Link>}

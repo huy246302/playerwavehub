@@ -51,7 +51,8 @@ export async function listPlayers(f: PlayerFilters) {
     .order("updated_at", { ascending: false })
     .range((page - 1) * PAGE_SIZE, page * PAGE_SIZE - 1);
 
-  if (f.q) q = q.ilike("person.full_name", `%${f.q}%`);
+  const term = f.q?.replace(/[,()%*\\]/g, " ").trim();
+  if (term) q = q.or(`full_name.ilike.%${term}%,display_name.ilike.%${term}%`, { referencedTable: "person" });
   if (f.status) q = q.eq("is_published", f.status === "published");
   if (f.from) q = q.gte("career_start_year", f.from);
   if (f.to) q = q.lte("retired_year", f.to);
@@ -117,7 +118,7 @@ export async function listAvailableBiographies() {
   const { data: taken, error: e1 } = await sb.from("players").select("biography_id");
   if (e1) throw fail(e1);
   const ids = (taken ?? []).map((r) => r.biography_id);
-  let q = sb.from("biographies").select("id, full_name").order("full_name");
+  let q = sb.from("biographies").select("id, full_name, display_name").order("full_name");
   if (ids.length) q = q.not("id", "in", `(${ids.join(",")})`);
   const { data, error } = await q;
   if (error) throw fail(error);

@@ -4,6 +4,7 @@ import { getCoachHiddenAttributes } from "@/lib/db/coach-attributes";
 import CoachHiddenAttributesForm from "@/components/coaches/HiddenAttributesForm";
 import { DetailTabs } from "@/components/ui/DetailTabs";
 import { Breadcrumbs, PageHeader } from "@/components/ui/kit";
+import { displayName } from "@/lib/names";
 
 const TABS = [
   { key: "overview", label: "Overview" }, { key: "attributes", label: "Attributes" },
@@ -23,7 +24,7 @@ export default async function CoachHiddenAttributesPage({ params }: { params: Pr
     <div className="space-y-6">
       <Breadcrumbs items={[
         { label: "Archive", href: "/" }, { label: "Head coaches", href: "/head-coach" },
-        { label: coach.person?.full_name ?? `Coach #${coach.id}`, href: basePath }, { label: "Hidden attributes" },
+        { label: displayName(coach.person, `Coach #${coach.id}`), href: basePath }, { label: "Hidden attributes" },
       ]} />
       <PageHeader title="Hidden attributes" description="Reputation, personality and managed-separately values." />
       <DetailTabs basePath={basePath} current="hidden-attributes" tabs={TABS} />

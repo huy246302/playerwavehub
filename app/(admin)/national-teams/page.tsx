@@ -6,6 +6,8 @@ import RecordTable from "@/components/ui/RecordTable";
 import {
   Breadcrumbs, PageHeader, Pager, Thumb, fmtDate, inputCls, ghostBtn, primaryBtn,
 } from "@/components/ui/kit";
+import { clip } from "@/lib/names";
+import ClipText from "@/components/ui/ClipText";
 
 type SP = Record<string, string | undefined>;
 
@@ -35,7 +37,7 @@ export default async function NationalTeamsPage({ searchParams }: { searchParams
         <Thumb src={t.crest_url} className="h-6 w-6 rounded-full border border-neutral-200 object-cover" />
         {t.name}
       </Link>,
-      <span key="co" className="text-neutral-600">{t.country?.name ?? "—"}</span>,
+      <span key="co" className="text-neutral-600">{t.country ? <ClipText text={t.country.name} /> : "—"}</span>,
       <span key="u" className="text-neutral-500">{fmtDate(t.updated_at)}</span>,
     ],
   }));
@@ -54,7 +56,7 @@ export default async function NationalTeamsPage({ searchParams }: { searchParams
           <input name="q" defaultValue={sp.q} placeholder="Search by team name…" className={`${inputCls} min-w-56 flex-1`} />
           <select name="country" defaultValue={countryId ? String(countryId) : ""} className={`${inputCls} w-auto`}>
             <option value="">Country: All</option>
-            {countries.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+            {countries.map((c) => <option key={c.id} value={c.id} title={c.name}>{clip(c.name)}</option>)}
           </select>
           <button className={ghostBtn}>Apply</button>
           {(sp.q || countryId) && <Link href="/national-teams" className="px-2 py-2 text-sm text-neutral-500 underline">Clear</Link>}

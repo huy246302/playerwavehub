@@ -6,6 +6,7 @@ import type { FormState } from "@/lib/form-state";
 import type { Biography } from "@/lib/db/biographies";
 import { Card, DefList, Field, fmtDateTime, ghostBtn, inputCls, primaryBtn } from "@/components/ui/kit";
 import DateInput from "@/components/ui/DateInput";
+import { clip } from "@/lib/names";
 
 export default function BiographyForm({
   biography, countries,
@@ -26,7 +27,7 @@ export default function BiographyForm({
   const countrySelect = (name: string, current?: number | null) => (
     <select name={name} defaultValue={val(name, current)} className={inputCls}>
       <option value="">Not set</option>
-      {countries.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+      {countries.map((c) => <option key={c.id} value={c.id} title={c.name}>{clip(c.name)}</option>)}
     </select>
   );
 

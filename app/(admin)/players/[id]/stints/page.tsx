@@ -7,6 +7,7 @@ import ClubStintsCard from "@/components/players/stints/ClubStintsCard";
 import NationalStintsCard from "@/components/players/stints/NationalStintsCard";
 import { DetailTabs } from "@/components/ui/DetailTabs";
 import { Breadcrumbs, PageHeader } from "@/components/ui/kit";
+import { displayName } from "@/lib/names";
 
 const TABS = [
   { key: "overview", label: "Overview" }, { key: "attributes", label: "Attributes" },
@@ -28,7 +29,7 @@ export default async function PlayerStintsPage({ params }: { params: Promise<{ i
     <div className="space-y-6">
       <Breadcrumbs items={[
         { label: "Archive", href: "/" }, { label: "Players", href: "/players" },
-        { label: player.person?.full_name ?? `Player #${player.id}`, href: basePath }, { label: "Career stints" },
+        { label: displayName(player.person, `Player #${player.id}`), href: basePath }, { label: "Career stints" },
       ]} />
       <PageHeader title="Career stints" description="Club and national team spells." />
       <DetailTabs basePath={basePath} current="stints" tabs={TABS} />

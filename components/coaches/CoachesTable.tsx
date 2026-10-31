@@ -3,6 +3,7 @@ import { useState, useTransition } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { deleteCoaches } from "@/lib/actions/coach";
 import type { CoachRow } from "@/lib/db/coach";
+import { displayName } from "@/lib/names";
 
 const btn =
   "inline-flex items-center rounded-md border px-3 py-1.5 text-sm disabled:cursor-not-allowed disabled:opacity-40";
@@ -84,7 +85,7 @@ export default function CoachesTable({ rows }: { rows: CoachRow[] }) {
                 <input type="checkbox" checked={selected.includes(r.id)}
                   onClick={(e) => e.stopPropagation()} onChange={() => toggle(r.id)} />
               </td>
-              <td className="px-2 py-2.5 font-medium">{r.person?.full_name ?? "—"}</td>
+              <td className="px-2 py-2.5 font-medium">{displayName(r.person)}</td>
               <td className="px-2 py-2.5">{r.career_start_year ?? "?"}–{r.retired_year ?? "…"}</td>
               <td className="max-w-xs truncate px-2 py-2.5 text-neutral-600">{r.legacy_summary ?? "—"}</td>
               <td className="px-2 py-2.5">

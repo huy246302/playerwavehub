@@ -6,6 +6,7 @@ import DeleteRecordButton from "@/components/ui/DeleteRecordButton";
 import { DetailTabs } from "@/components/ui/DetailTabs";
 import NationalityTag from "@/components/ui/NationalityTag";
 import { Breadcrumbs, Card, DefList, PageHeader, fmtDateTime, primaryBtn } from "@/components/ui/kit";
+import { displayName } from "@/lib/names";
 
 const TABS = [
   { key: "overview", label: "Overview" },
@@ -26,13 +27,13 @@ export default async function PlayerPage({ params }: { params: Promise<{ id: str
 
   return (
     <div className="space-y-6">
-      <Breadcrumbs items={[{ label: "Archive", href: "/" }, { label: "Players", href: "/players" }, { label: player.person?.full_name ?? `Player #${player.id}` }]} />
+      <Breadcrumbs items={[{ label: "Archive", href: "/" }, { label: "Players", href: "/players" }, { label: displayName(player.person, `Player #${player.id}`) }]} />
       <PageHeader
-        title={player.person?.full_name ?? `Player #${player.id}`}
+        title={displayName(player.person, `Player #${player.id}`)}
         description={`Player #${player.id} · Linked Biography #${player.biography_id}`}
         actions={
           <>
-            <DeleteRecordButton id={player.id} name={player.person?.full_name ?? "this player"} noun="player"
+            <DeleteRecordButton id={player.id} name={displayName(player.person, "this player")} noun="player"
               action={deletePlayers} redirectTo="/players" />
             <Link href={`${basePath}/edit`} className={primaryBtn}>Edit player</Link>
           </>

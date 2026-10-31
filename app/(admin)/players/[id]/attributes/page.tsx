@@ -8,6 +8,7 @@ import PositionsFeetCard from "@/components/players/PositionsFeetCard";
 import { DetailTabs } from "@/components/ui/DetailTabs";
 import { Breadcrumbs, PageHeader } from "@/components/ui/kit";
 import { playerKindFromPrimary } from "@/lib/validation/player-attributes";
+import { displayName } from "@/lib/names";
 
 const TABS = [
   { key: "overview", label: "Overview" }, { key: "attributes", label: "Attributes" },
@@ -30,7 +31,7 @@ export default async function PlayerAttributesPage({ params }: { params: Promise
     <div className="space-y-6">
       <Breadcrumbs items={[
         { label: "Archive", href: "/" }, { label: "Players", href: "/players" },
-        { label: player.person?.full_name ?? `Player #${player.id}`, href: basePath }, { label: "Attributes" },
+        { label: displayName(player.person, `Player #${player.id}`), href: basePath }, { label: "Attributes" },
       ]} />
       <PageHeader title="Player attributes" description="Technical, mental, physical, goalkeeping ratings, positions and foot." />
       <DetailTabs basePath={basePath} current="attributes" tabs={TABS} />

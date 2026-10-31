@@ -4,6 +4,7 @@ import { deleteCoaches } from "@/lib/actions/coach";
 import RecordTable from "@/components/ui/RecordTable";
 import NationalityTag from "@/components/ui/NationalityTag";
 import { Breadcrumbs, PageHeader, Pager, fmtDate, inputCls, ghostBtn, primaryBtn } from "@/components/ui/kit";
+import { clip, displayName, fullNameIfDifferent } from "@/lib/names";
 
 type SP = Record<string, string | undefined>;
 
@@ -40,8 +41,8 @@ export default async function HeadCoachPage({ searchParams }: { searchParams: Pr
     id: r.id,
     cells: [
       <Link key="n" href={`/head-coach/${r.id}`} className="block hover:underline">
-        <span className="font-medium">{r.person?.full_name ?? "—"}</span>
-        <br /><span className="text-xs text-neutral-400">Biography #{r.person?.id ?? "—"}</span>
+        <span className="font-medium">{displayName(r.person)}</span>
+        <br /><span className="text-xs text-neutral-400">{clip(fullNameIfDifferent(r.person) ?? `Biography #${r.person?.id ?? "—"}`, 40)}</span>
       </Link>,
       <span key="nat" className="text-neutral-600">
         <NationalityTag nationality={r.person?.nationality} />

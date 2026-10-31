@@ -4,6 +4,7 @@ import Link from "next/link";
 import { createNationalTeam, updateNationalTeam } from "@/lib/actions/national-teams";
 import type { FormState } from "@/lib/form-state";
 import { Card, DefList, Field, fmtDateTime, ghostBtn, inputCls, primaryBtn } from "@/components/ui/kit";
+import { clip } from "@/lib/names";
 
 type Team = {
   id: number; slug: string; name: string; crest_url: string | null; description: string | null;
@@ -36,7 +37,7 @@ export default function NationalTeamForm({
                 <Field label="Country" required error={err("country_id")}>
                   <select name="country_id" defaultValue={countryId} className={inputCls}>
                     <option value="">{countries.length ? "Select a country…" : "No countries added yet"}</option>
-                    {countries.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+                    {countries.map((c) => <option key={c.id} value={c.id} title={c.name}>{clip(c.name)}</option>)}
                   </select>
                 </Field>
                 <Link href="/countries/new" target="_blank" rel="noopener noreferrer"

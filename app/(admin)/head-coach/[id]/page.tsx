@@ -6,6 +6,7 @@ import DeleteRecordButton from "@/components/ui/DeleteRecordButton";
 import { DetailTabs } from "@/components/ui/DetailTabs";
 import NationalityTag from "@/components/ui/NationalityTag";
 import { Breadcrumbs, Card, DefList, PageHeader, fmtDateTime, primaryBtn } from "@/components/ui/kit";
+import { displayName } from "@/lib/names";
 
 const TABS = [
   { key: "overview", label: "Overview" }, { key: "attributes", label: "Attributes" },
@@ -24,13 +25,13 @@ export default async function CoachPage({ params }: { params: Promise<{ id: stri
 
   return (
     <div className="space-y-6">
-      <Breadcrumbs items={[{ label: "Archive", href: "/" }, { label: "Head coaches", href: "/head-coach" }, { label: coach.person?.full_name ?? `Coach #${coach.id}` }]} />
+      <Breadcrumbs items={[{ label: "Archive", href: "/" }, { label: "Head coaches", href: "/head-coach" }, { label: displayName(coach.person, `Coach #${coach.id}`) }]} />
       <PageHeader
-        title={coach.person?.full_name ?? `Coach #${coach.id}`}
+        title={displayName(coach.person, `Coach #${coach.id}`)}
         description={`Coach #${coach.id} · Linked Biography #${coach.biography_id}`}
         actions={
           <>
-            <DeleteRecordButton id={coach.id} name={coach.person?.full_name ?? "this coach"} noun="head coach"
+            <DeleteRecordButton id={coach.id} name={displayName(coach.person, "this coach")} noun="head coach"
               action={deleteCoaches} redirectTo="/head-coach" />
             <Link href={`${basePath}/edit`} className={primaryBtn}>Edit head coach</Link>
           </>
