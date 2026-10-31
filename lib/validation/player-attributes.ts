@@ -5,7 +5,6 @@ export const ATTRIBUTE_GROUPS = [
   { title: "Mental", fields: ["aggression","anticipation","bravery","composure","concentration","decisions","determination","flair","leadership","off_the_ball","positioning","teamwork","vision","work_rate"] },
   { title: "Physical", fields: ["acceleration","agility","balance","jumping_reach","natural_fitness","pace","stamina","strength"] },
   { title: "Goalkeeping", fields: ["aerial_reach","command_of_area","communication","eccentricity","handling","kicking","one_on_ones","penalty_stopping","punching","reflexes","rushing_out","throwing"] },
-  { title: "Feet", fields: ["left_foot","right_foot"] },
 ] as const;
 
 export const ALL_ATTRIBUTE_FIELDS: string[] = ATTRIBUTE_GROUPS.flatMap((g) => g.fields);
