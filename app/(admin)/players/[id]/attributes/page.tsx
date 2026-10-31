@@ -7,6 +7,7 @@ import AttributesForm from "@/components/players/AttributesForm";
 import PositionsFeetCard from "@/components/players/PositionsFeetCard";
 import { DetailTabs } from "@/components/ui/DetailTabs";
 import { Breadcrumbs, PageHeader } from "@/components/ui/kit";
+import { playerKindFromPrimary } from "@/lib/validation/player-attributes";
 
 const TABS = [
   { key: "overview", label: "Overview" }, { key: "attributes", label: "Attributes" },
@@ -23,6 +24,7 @@ export default async function PlayerAttributesPage({ params }: { params: Promise
   ]);
   if (!player) notFound();
   const basePath = `/players/${player.id}`;
+  const kind = playerKindFromPrimary(positions.find((p) => p.is_primary)?.position);
 
   return (
     <div className="space-y-6">
@@ -32,8 +34,8 @@ export default async function PlayerAttributesPage({ params }: { params: Promise
       ]} />
       <PageHeader title="Player attributes" description="Technical, mental, physical, goalkeeping ratings, positions and foot." />
       <DetailTabs basePath={basePath} current="attributes" tabs={TABS} />
-      <AttributesForm playerId={player.id} attributes={attrs} backHref={basePath} />
       <PositionsFeetCard playerId={player.id} positions={positions} feet={feet} />
+      <AttributesForm playerId={player.id} attributes={attrs} backHref={basePath} kind={kind} />
     </div>
   );
 }
