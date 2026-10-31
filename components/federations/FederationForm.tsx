@@ -1,6 +1,7 @@
 "use client";
 import { useActionState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { createFederation, updateFederation } from "@/lib/actions/federations";
 import { CONFEDERATIONS } from "@/lib/validation/federation";
 import type { FormState } from "@/lib/form-state";
@@ -17,7 +18,8 @@ type Federation = {
 
 export default function FederationForm({
   federation, countries,
-}: { federation?: Federation | null; countries: { id: number; name: string }[] }) {
+}: { federation?: Federation | null; countries: { id: number; name: string; is_historical?: boolean }[] }) {
+  const router = useRouter();
   const editing = !!federation;
   const [state, action, pending] = useActionState<FormState, FormData>(
     editing ? updateFederation.bind(null, federation!.id) : createFederation,
@@ -41,7 +43,7 @@ export default function FederationForm({
                 <input name="short_name" placeholder="VFF" className={inputCls}
                   defaultValue={val("short_name", federation?.short_name)} />
               </Field>
-              <Field label="Founded year" required error={err("founded_year")} hint="Four digits">
+              <Field label="Founded year" required error={err("founded_year")} hint="Four digits, up to this year">
                 <input name="founded_year" inputMode="numeric" placeholder="YYYY" className={inputCls}
                   defaultValue={val("founded_year", federation ? String(federation.founded_year) : undefined)} />
               </Field>
@@ -61,13 +63,19 @@ export default function FederationForm({
               <Field label="Country" required error={err("country_id")}>
                 <select name="country_id" defaultValue={countryId} className={inputCls}>
                   <option value="">{countries.length ? "Select a country…" : "No countries added yet"}</option>
-                  {countries.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+                  {countries.map((c) => (
+                    <option key={c.id} value={c.id}>{c.name}{c.is_historical ? " (historical)" : ""}</option>
+                  ))}
                 </select>
               </Field>
               <Link href="/countries/new" target="_blank" rel="noopener noreferrer"
                 className="mt-1 inline-block text-xs text-[#254a39] underline">
                 + Add country
               </Link>
+              <button type="button" onClick={() => router.refresh()}
+                className="ml-3 mt-1 text-xs text-[#254a39] underline">
+                Refresh list
+              </button>
             </div>
           </Card>
 

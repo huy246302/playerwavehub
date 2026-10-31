@@ -1,6 +1,5 @@
 import { notFound } from "next/navigation";
-import { getFederation } from "@/lib/db/federations";
-import { listCountryOptions } from "@/lib/db/countries";
+import { getFederation, listFederationCountryOptions } from "@/lib/db/federations";
 import FederationForm from "@/components/federations/FederationForm";
 import { Breadcrumbs, PageHeader } from "@/components/ui/kit";
 
@@ -8,7 +7,7 @@ export default async function EditFederationPage({ params }: { params: Promise<{
   const { id } = await params;
   const num = Number(id);
   if (!Number.isInteger(num)) notFound();
-  const [federation, countries] = await Promise.all([getFederation(num), listCountryOptions()]);
+  const [federation, countries] = await Promise.all([getFederation(num), listFederationCountryOptions()]);
   if (!federation) notFound();
 
   return (

@@ -1,9 +1,9 @@
 import FederationForm from "@/components/federations/FederationForm";
-import { listCountryOptions } from "@/lib/db/countries";
+import { listFederationCountryOptions } from "@/lib/db/federations";
 import { Breadcrumbs, PageHeader } from "@/components/ui/kit";
 
 export default async function NewFederationPage() {
-  const countries = await listCountryOptions();
+  const countries = await listFederationCountryOptions();
   return (
     <div className="space-y-6">
       <Breadcrumbs items={[

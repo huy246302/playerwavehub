@@ -90,3 +90,11 @@ export async function listFederationOptions() {
     id: number; name: string; country_id: number; founded_year: number; ended_year: number | null;
   }[];
 }
+
+// Every country, historical ones included, so a federation can belong to e.g. the USSR.
+export async function listFederationCountryOptions() {
+  const { data, error } = await createAdminClient()
+    .from("countries").select("id, name, is_historical").order("name");
+  if (error) throw fail(error);
+  return (data ?? []) as { id: number; name: string; is_historical: boolean }[];
+}
