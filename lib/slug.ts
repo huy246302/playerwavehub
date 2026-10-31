@@ -8,7 +8,7 @@ export const slugify = (s: string) =>
 // type DbError = { message: string; code?: string; details?: string };
   
 export async function insertWithSlug(
-  table: "countries" | "clubs" | "national_teams",
+  table: "countries" | "clubs" | "national_teams" | "federations",
   name: string,
   row: Record<string, unknown>
 ): Promise<{ id?: number; error?: { message: string; code?: string; details?: string } }> {

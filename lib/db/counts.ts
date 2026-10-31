@@ -2,7 +2,7 @@ import { cache } from "react";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 export const COUNT_TABLES = [
-  "biographies", "players", "coaches", "clubs", "national_teams", "countries", "sources",
+  "biographies", "players", "coaches", "clubs", "national_teams", "federations", "countries", "sources",
 ] as const;
 
 export const getCounts = cache(async () => {

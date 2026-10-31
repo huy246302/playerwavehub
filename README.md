@@ -35,6 +35,7 @@ The easiest way to deploy your Next.js app is to use the [Vercel Platform](https
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
 
+
 ```
 playerwavehub
 ├─ app
@@ -152,9 +153,11 @@ playerwavehub
 │  │  ├─ SourceForm.tsx
 │  │  └─ SourceLinker.tsx
 │  └─ ui
+│     ├─ DateInput.tsx
 │     ├─ DeleteRecordButton.tsx
 │     ├─ DetailTabs.tsx
 │     ├─ kit.tsx
+│     ├─ NationalityTag.tsx
 │     └─ RecordTable.tsx
 ├─ eslint.config.mjs
 ├─ lib
@@ -245,7 +248,9 @@ playerwavehub
 │     ├─ 20261017165713_init.sql
 │     ├─ 20261019192749_rename_people_to_biographies.sql
 │     ├─ 20261020180311_finish_biographies_rename.sql
-│     └─ 20261023161202_restrict_biography_delete.sql
+│     ├─ 20261023161202_restrict_biography_delete.sql
+│     ├─ 20261027000000_country_demonym.sql
+│     └─ 20261031120000_add_federations_and_lifespans.sql
 └─ tsconfig.json
 
 ```

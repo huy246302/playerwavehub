@@ -14,6 +14,7 @@ const SUB: Item[] = [
 const REST: Item[] = [
   { label: "Clubs", href: "/clubs", icon: "club", countKey: "clubs" },
   { label: "National teams", href: "/national-teams", icon: "team", countKey: "national_teams" },
+  { label: "Federations", href: "/federations", icon: "federation", countKey: "federations" },
   { label: "Countries", href: "/countries", icon: "country", countKey: "countries" },
   { label: "Sources", href: "/sources", icon: "source", countKey: "sources" },
 ];
