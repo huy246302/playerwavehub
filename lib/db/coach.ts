@@ -1,5 +1,6 @@
 import "server-only";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { by, resolveSort, type SortMap } from "@/lib/db/sort";
 import { fail, PAGE_SIZE } from "@/lib/db/util";
 import type { Nationality } from "@/lib/db/players";
 
@@ -14,13 +15,23 @@ export type CoachRow = {
 };
 
 export type CoachFilters = {
-  q?: string; status?: "draft" | "published"; from?: number; to?: number; page?: number;
+  q?: string; status?: "draft" | "published"; from?: number; to?: number; page?: number; sort?: string;
+};
+
+export const COACH_SORTS: SortMap = {
+  updated_desc: by("Recently updated", ["updated_at", "desc"], ["id", "desc"]),
+  created_desc: by("Newest added", ["created_at", "desc"], ["id", "desc"]),
+  created_asc: by("Oldest added", ["created_at", "asc"], ["id", "asc"]),
+  name_asc: by("Name A–Z", ["person(sort_name)", "asc"], ["id", "asc"]),
+  name_desc: by("Name Z–A", ["person(sort_name)", "desc"], ["id", "desc"]),
+  career_asc: by("Career start: earliest", ["career_start_year", "asc"], ["id", "asc"]),
+  career_desc: by("Career start: latest", ["career_start_year", "desc"], ["id", "desc"]),
 };
 
 const NATIONALITY = "nationality:countries!nationality_id(id, name, demonym, is_historical)";
 
 const COLS =
-  `id, biography_id, legacy_summary, career_start_year, retired_year, is_published, updated_at, updated_by, person:biographies!inner(id, full_name, display_name, ${NATIONALITY})`;
+  `id, biography_id, legacy_summary, career_start_year, retired_year, is_published, updated_at, updated_by, person:biographies!inner(id, full_name, display_name, sort_name, ${NATIONALITY})`;
 
 const first = <T,>(v: T | T[] | null | undefined): T | null =>
   Array.isArray(v) ? v[0] ?? null : v ?? null;
@@ -43,9 +54,10 @@ export async function listCoaches(f: CoachFilters) {
   const sb = createAdminClient();
   const page = f.page && f.page > 0 ? f.page : 1;
 
+  const { order } = resolveSort(f.sort, COACH_SORTS, "updated_desc");
   let q = sb.from("coaches").select(COLS, { count: "exact" })
-    .order("updated_at", { ascending: false })
     .range((page - 1) * PAGE_SIZE, page * PAGE_SIZE - 1);
+  for (const o of order) q = q.order(o.column, { ascending: o.ascending, nullsFirst: false });
 
   const term = f.q?.replace(/[,()%*\\]/g, " ").trim();
   if (term) q = q.or(`full_name.ilike.%${term}%,display_name.ilike.%${term}%`, { referencedTable: "person" });

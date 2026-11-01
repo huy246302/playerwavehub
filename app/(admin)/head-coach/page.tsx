@@ -1,22 +1,26 @@
 import Link from "next/link";
-import { listCoaches, coachStatusCounts } from "@/lib/db/coach";
+import { listCoaches, coachStatusCounts, COACH_SORTS } from "@/lib/db/coach";
 import { deleteCoaches } from "@/lib/actions/coach";
 import RecordTable from "@/components/ui/RecordTable";
 import NationalityTag from "@/components/ui/NationalityTag";
-import { Breadcrumbs, PageHeader, Pager, fmtDate, inputCls, ghostBtn, primaryBtn } from "@/components/ui/kit";
+import { Breadcrumbs, PageHeader, Pager, fmtDate, primaryBtn } from "@/components/ui/kit";
 import { clip, displayName, fullNameIfDifferent } from "@/lib/names";
+import ListToolbar from "@/components/ui/ListToolbar";
+import { resolveSort, sortOptions } from "@/lib/db/sort";
 
 type SP = Record<string, string | undefined>;
+const DEFAULT_SORT = "updated_desc";
+const int = (v?: string) => (v && /^\d{1,9}$/.test(v) ? Number(v) : undefined);
 
 export default async function HeadCoachPage({ searchParams }: { searchParams: Promise<SP> }) {
   const sp = await searchParams;
   const status = sp.status === "draft" || sp.status === "published" ? sp.status : undefined;
+  const { key: sort } = resolveSort(sp.sort, COACH_SORTS, DEFAULT_SORT);
 
   const [{ rows, total, pageSize, page }, counts] = await Promise.all([
     listCoaches({
-      q: sp.q, status, page: sp.page ? Number(sp.page) : 1,
-      from: sp.from ? Number(sp.from) : undefined,
-      to: sp.to ? Number(sp.to) : undefined,
+      q: sp.q, status, page: int(sp.page) ?? 1, sort,
+      from: int(sp.from), to: int(sp.to),
     }),
     coachStatusCounts(),
   ]);
@@ -28,7 +32,7 @@ export default async function HeadCoachPage({ searchParams }: { searchParams: Pr
     const s = u.toString();
     return s ? `/head-coach?${s}` : "/head-coach";
   };
-  const base = { q: sp.q, from: sp.from, to: sp.to };
+  const base = { q: sp.q, from: int(sp.from), to: int(sp.to), sort: sort === DEFAULT_SORT ? undefined : sort };
   const href = (p: number) => qs({ ...base, status, page: p > 1 ? p : undefined });
   const tab = (label: string, value: string | undefined, n: number) => (
     <Link href={qs({ ...base, status: value })}
@@ -71,14 +75,14 @@ export default async function HeadCoachPage({ searchParams }: { searchParams: Pr
           {tab("Published", "published", counts.published)}
         </div>
 
-        <form method="get" className="flex flex-wrap gap-2 border-b border-neutral-200 p-4">
-          {status && <input type="hidden" name="status" value={status} />}
-          <input name="q" defaultValue={sp.q} placeholder="Search by coach name…" className={`${inputCls} w-auto! min-w-56 flex-1`} />
-          <input name="from" defaultValue={sp.from} inputMode="numeric" placeholder="Career from" className={`${inputCls} w-32!`} />
-          <input name="to" defaultValue={sp.to} inputMode="numeric" placeholder="Retired by" className={`${inputCls} w-32!`} />
-          <button className={ghostBtn}>Apply</button>
-          {(sp.q || sp.from || sp.to) && <Link href={qs({ status })} className="px-2 py-2 text-sm text-neutral-500 underline">Clear</Link>}
-        </form>
+        <ListToolbar
+          basePath="/head-coach" searchPlaceholder="Search by display name or full name…"
+          sortOptions={sortOptions(COACH_SORTS)} defaultSort={DEFAULT_SORT} total={total}
+          fields={[
+            { kind: "number", name: "from", label: "Career from (year)", placeholder: "YYYY" },
+            { kind: "number", name: "to", label: "Retired by (year)", placeholder: "YYYY" },
+          ]}
+        />
 
         <RecordTable
           basePath="/head-coach" noun="head coach"

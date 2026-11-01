@@ -1,23 +1,30 @@
 import Link from "next/link";
-import { listSources } from "@/lib/db/sources";
+import { listSources, SOURCE_SORTS } from "@/lib/db/sources";
 import { deleteSources } from "@/lib/actions/sources";
 import RecordTable from "@/components/ui/RecordTable";
-import { Breadcrumbs, PageHeader, Pager, fmtDate, inputCls, ghostBtn, primaryBtn } from "@/components/ui/kit";
+import { Breadcrumbs, PageHeader, Pager, fmtDate, primaryBtn } from "@/components/ui/kit";
+import ListToolbar from "@/components/ui/ListToolbar";
+import { resolveSort, sortOptions } from "@/lib/db/sort";
+import { buildHref } from "@/lib/list-params";
 
 type SP = Record<string, string | undefined>;
+const DEFAULT_SORT = "created_desc";
+const int = (v?: string) => (v && /^\d{1,9}$/.test(v) ? Number(v) : undefined);
+
 
 export default async function SourcesPage({ searchParams }: { searchParams: Promise<SP> }) {
   const sp = await searchParams;
-  const { rows, total, pageSize, page } = await listSources({ q: sp.q, page: sp.page ? Number(sp.page) : 1 });
+  const fromYear = int(sp.from), toYear = int(sp.to);
+  const publisher = sp.publisher?.trim() || undefined;
+  const { key: sort } = resolveSort(sp.sort, SOURCE_SORTS, DEFAULT_SORT);
+  const { rows, total, pageSize, page } = await listSources({
+    q: sp.q, publisher, fromYear, toYear, sort, page: int(sp.page) ?? 1,
+  });
   const pages = Math.max(1, Math.ceil(total / pageSize));
 
-  const href = (p: number) => {
-    const u = new URLSearchParams();
-    if (sp.q) u.set("q", sp.q);
-    if (p > 1) u.set("page", String(p));
-    const s = u.toString();
-    return s ? `/sources?${s}` : "/sources";
-  };
+  const href = (p: number) => buildHref("/sources", {
+    q: sp.q, publisher, from: fromYear, to: toYear, sort: sort === DEFAULT_SORT ? undefined : sort, page: p > 1 ? p : undefined,
+  });
 
   const tableRows = rows.map((s) => ({
     id: s.id,
@@ -37,11 +44,15 @@ export default async function SourcesPage({ searchParams }: { searchParams: Prom
         actions={<Link href="/sources/new" className={primaryBtn}>+ Add source</Link>} />
 
       <section className="rounded-xl border border-neutral-200 bg-[#fbfaf6]">
-        <form method="get" className="flex flex-wrap gap-2 border-b border-neutral-200 p-4">
-          <input name="q" defaultValue={sp.q} placeholder="Search by title, publisher or author…" className={`${inputCls} min-w-56 flex-1`} />
-          <button className={ghostBtn}>Apply</button>
-          {sp.q && <Link href="/sources" className="px-2 py-2 text-sm text-neutral-500 underline">Clear</Link>}
-        </form>
+        <ListToolbar
+          basePath="/sources" searchPlaceholder="Search by title, publisher or author…"
+          sortOptions={sortOptions(SOURCE_SORTS)} defaultSort={DEFAULT_SORT} total={total}
+          fields={[
+            { kind: "text", name: "publisher", label: "Publisher contains", placeholder: "e.g. Penguin" },
+            { kind: "number", name: "from", label: "Published from (year)", placeholder: "YYYY" },
+            { kind: "number", name: "to", label: "Published to (year)", placeholder: "YYYY" },
+          ]}
+        />
 
         <RecordTable
           basePath="/sources" noun="source"

@@ -1,24 +1,35 @@
 import Link from "next/link";
-import { listFederations, statusCounts, type FederationStatus } from "@/lib/db/federations";
+import { listFederations, statusCounts, FEDERATION_SORTS, type FederationStatus } from "@/lib/db/federations";
 import { listCountryOptions } from "@/lib/db/countries";
 import { deleteFederations } from "@/lib/actions/federations";
 import RecordTable from "@/components/ui/RecordTable";
 import {
-  Breadcrumbs, PageHeader, Pager, Thumb, fmtDate, inputCls, ghostBtn, primaryBtn,
+  Breadcrumbs, PageHeader, Pager, Thumb, fmtDate, primaryBtn,
 } from "@/components/ui/kit";
 import { clip } from "@/lib/names";
 import ClipText from "@/components/ui/ClipText";
+import ListToolbar from "@/components/ui/ListToolbar";
+import { resolveSort, sortOptions } from "@/lib/db/sort";
+import { CONFEDERATIONS } from "@/lib/validation/federation";
 
 type SP = Record<string, string | undefined>;
+const DEFAULT_SORT = "name_asc";
+const int = (v?: string) => (v && /^\d{1,9}$/.test(v) ? Number(v) : undefined);
+
 
 export default async function FederationsPage({ searchParams }: { searchParams: Promise<SP> }) {
   const sp = await searchParams;
-  const countryId = sp.country ? Number(sp.country) : undefined;
+  const countryId = int(sp.country);
+  const confed = (CONFEDERATIONS as readonly string[]).includes(sp.confed ?? "") ? sp.confed : undefined;
+  const from = int(sp.from), to = int(sp.to);
+  const { key: sort } = resolveSort(sp.sort, FEDERATION_SORTS, DEFAULT_SORT);
   const status: FederationStatus | undefined =
     sp.status === "active" || sp.status === "defunct" ? sp.status : undefined;
 
   const [{ rows, total, pageSize, page }, countries, counts] = await Promise.all([
-    listFederations({ q: sp.q, countryId, status, page: sp.page ? Number(sp.page) : 1 }),
+    listFederations({
+      q: sp.q, countryId, status, confederation: confed, foundedFrom: from, foundedTo: to, sort, page: int(sp.page) ?? 1,
+    }),
     listCountryOptions(),
     statusCounts(),
   ]);
@@ -30,7 +41,7 @@ export default async function FederationsPage({ searchParams }: { searchParams: 
     const s = u.toString();
     return s ? `/federations?${s}` : "/federations";
   };
-  const base = { q: sp.q, country: countryId };
+  const base = { q: sp.q, country: countryId, confed, from, to, sort: sort === DEFAULT_SORT ? undefined : sort };
   const href = (p: number) => qs({ ...base, status, page: p > 1 ? p : undefined });
   const tab = (label: string, value: FederationStatus | undefined, n: number) => (
     <Link href={qs({ ...base, status: value })}
@@ -72,16 +83,16 @@ export default async function FederationsPage({ searchParams }: { searchParams: 
           {tab("Defunct", "defunct", counts.defunct)}
         </div>
 
-        <form method="get" className="flex flex-wrap gap-2 border-b border-neutral-200 p-4">
-          {status && <input type="hidden" name="status" value={status} />}
-          <input name="q" defaultValue={sp.q} placeholder="Search by federation name…" className={`${inputCls} min-w-56 flex-1`} />
-          <select name="country" defaultValue={countryId ? String(countryId) : ""} className={`${inputCls} w-auto`}>
-            <option value="">Country: All</option>
-            {countries.map((c) => <option key={c.id} value={c.id} title={c.name}>{clip(c.name)}</option>)}
-          </select>
-          <button className={ghostBtn}>Apply</button>
-          {(sp.q || countryId) && <Link href={qs({ status })} className="px-2 py-2 text-sm text-neutral-500 underline">Clear</Link>}
-        </form>
+        <ListToolbar
+          basePath="/federations" searchPlaceholder="Search federations by name…"
+          sortOptions={sortOptions(FEDERATION_SORTS)} defaultSort={DEFAULT_SORT} total={total}
+          fields={[
+            { kind: "select", name: "country", label: "Country", options: countries.map((c) => ({ value: String(c.id), label: clip(c.name) })) },
+            { kind: "select", name: "confed", label: "Confederation", options: CONFEDERATIONS.map((c) => ({ value: c, label: c })) },
+            { kind: "number", name: "from", label: "Founded from (year)", placeholder: "YYYY" },
+            { kind: "number", name: "to", label: "Founded to (year)", placeholder: "YYYY" },
+          ]}
+        />
 
         <RecordTable
           basePath="/federations"

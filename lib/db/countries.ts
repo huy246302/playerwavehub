@@ -1,5 +1,6 @@
 import "server-only";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { by, resolveSort, type SortMap } from "@/lib/db/sort";
 import { fail, PAGE_SIZE } from "@/lib/db/util";
 
 export type Country = {
@@ -7,13 +8,21 @@ export type Country = {
   flag_url: string | null; is_historical: boolean; created_at: string;
 };
 
-export async function listCountries(f: { q?: string; historical?: "yes" | "no"; page?: number }) {
+export const COUNTRY_SORTS: SortMap = {
+  name_asc: by("Name A–Z", ["name", "asc"], ["id", "asc"]),
+  name_desc: by("Name Z–A", ["name", "desc"], ["id", "desc"]),
+  created_desc: by("Newest added", ["created_at", "desc"], ["id", "desc"]),
+  created_asc: by("Oldest added", ["created_at", "asc"], ["id", "asc"]),
+};
+
+export async function listCountries(f: { q?: string; historical?: "yes" | "no"; page?: number; sort?: string }) {
   const sb = createAdminClient();
   const page = f.page && f.page > 0 ? f.page : 1;
 
+  const { order } = resolveSort(f.sort, COUNTRY_SORTS, "name_asc");
   let q = sb.from("countries").select("*", { count: "exact" })
-    .order("name")
     .range((page - 1) * PAGE_SIZE, page * PAGE_SIZE - 1);
+  for (const o of order) q = q.order(o.column, { ascending: o.ascending, nullsFirst: false });
 
   if (f.q) q = q.ilike("name", `%${f.q}%`);
   if (f.historical) q = q.eq("is_historical", f.historical === "yes");

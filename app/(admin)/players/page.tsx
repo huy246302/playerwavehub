@@ -1,12 +1,16 @@
 import Link from "next/link";
-import { listPlayers, statusCounts } from "@/lib/db/players";
+import { listPlayers, statusCounts, PLAYER_SORTS } from "@/lib/db/players";
 import { deletePlayers } from "@/lib/actions/players";
 import RecordTable from "@/components/ui/RecordTable";
 import NationalityTag from "@/components/ui/NationalityTag";
-import { Breadcrumbs, PageHeader, Pager, fmtDate, inputCls, ghostBtn, primaryBtn } from "@/components/ui/kit";
+import { Breadcrumbs, PageHeader, Pager, fmtDate, primaryBtn } from "@/components/ui/kit";
 import { clip, displayName, fullNameIfDifferent } from "@/lib/names";
+import ListToolbar from "@/components/ui/ListToolbar";
+import { resolveSort, sortOptions } from "@/lib/db/sort";
 
 type SP = Record<string, string | undefined>;
+const DEFAULT_SORT = "updated_desc";
+const int = (v?: string) => (v && /^\d{1,9}$/.test(v) ? Number(v) : undefined);
 const HEIGHT_BANDS: Record<string, [number | undefined, number | undefined]> = {
   lt170: [undefined, 169], "170-179": [170, 179], "180-189": [180, 189], "190+": [190, undefined],
 };
@@ -16,12 +20,12 @@ export default async function PlayersPage({ searchParams }: { searchParams: Prom
   const status = sp.status === "draft" || sp.status === "published" ? sp.status : undefined;
   const heightBand = sp.height && sp.height in HEIGHT_BANDS ? sp.height : "";
   const [heightMin, heightMax] = heightBand ? HEIGHT_BANDS[heightBand] : [undefined, undefined];
+  const { key: sort } = resolveSort(sp.sort, PLAYER_SORTS, DEFAULT_SORT);
 
   const [{ rows, total, pageSize, page }, counts] = await Promise.all([
     listPlayers({
-      q: sp.q, status, page: sp.page ? Number(sp.page) : 1,
-      from: sp.from ? Number(sp.from) : undefined,
-      to: sp.to ? Number(sp.to) : undefined,
+      q: sp.q, status, page: int(sp.page) ?? 1, sort,
+      from: int(sp.from), to: int(sp.to),
       heightMin, heightMax,
     }),
     statusCounts(),
@@ -34,7 +38,10 @@ export default async function PlayersPage({ searchParams }: { searchParams: Prom
     const s = u.toString();
     return s ? `/players?${s}` : "/players";
   };
-  const base = { q: sp.q, from: sp.from, to: sp.to, height: heightBand || undefined };
+  const base = {
+    q: sp.q, from: int(sp.from), to: int(sp.to), height: heightBand || undefined,
+    sort: sort === DEFAULT_SORT ? undefined : sort,
+  };
   const href = (p: number) => qs({ ...base, status, page: p > 1 ? p : undefined });
   const tab = (label: string, value: string | undefined, n: number) => (
     <Link href={qs({ ...base, status: value })}
@@ -78,21 +85,18 @@ export default async function PlayersPage({ searchParams }: { searchParams: Prom
           {tab("Published", "published", counts.published)}
         </div>
 
-        <form method="get" className="flex flex-wrap gap-2 border-b border-neutral-200 p-4">
-          {status && <input type="hidden" name="status" value={status} />}
-          <input name="q" defaultValue={sp.q} placeholder="Search by player name…" className={`${inputCls} w-auto! min-w-56 flex-1`} />
-          <input name="from" defaultValue={sp.from} inputMode="numeric" placeholder="Career from" className={`${inputCls} w-32!`} />
-          <input name="to" defaultValue={sp.to} inputMode="numeric" placeholder="Retired by" className={`${inputCls} w-32!`} />
-          <select name="height" defaultValue={heightBand} className={`${inputCls} w-auto!`}>
-            <option value="">Height: Any</option>
-            <option value="lt170">Under 170 cm</option>
-            <option value="170-179">170–179 cm</option>
-            <option value="180-189">180–189 cm</option>
-            <option value="190+">190 cm+</option>
-          </select>
-          <button className={ghostBtn}>Apply</button>
-          {(sp.q || sp.from || sp.to || heightBand) && <Link href={qs({ status })} className="px-2 py-2 text-sm text-neutral-500 underline">Clear</Link>}
-        </form>
+        <ListToolbar
+          basePath="/players" searchPlaceholder="Search by display name or full name…"
+          sortOptions={sortOptions(PLAYER_SORTS)} defaultSort={DEFAULT_SORT} total={total}
+          fields={[
+            { kind: "number", name: "from", label: "Career from (year)", placeholder: "YYYY" },
+            { kind: "number", name: "to", label: "Retired by (year)", placeholder: "YYYY" },
+            { kind: "select", name: "height", label: "Height", options: [
+              { value: "lt170", label: "Under 170 cm" }, { value: "170-179", label: "170–179 cm" },
+              { value: "180-189", label: "180–189 cm" }, { value: "190+", label: "190 cm and over" },
+            ] },
+          ]}
+        />
 
         <RecordTable
           basePath="/players" noun="player"

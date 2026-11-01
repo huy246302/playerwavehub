@@ -1,30 +1,32 @@
 import Link from "next/link";
-import { listCountries } from "@/lib/db/countries";
+import { listCountries, COUNTRY_SORTS } from "@/lib/db/countries";
 import { deleteCountries } from "@/lib/actions/countries";
 import RecordTable from "@/components/ui/RecordTable";
 import {
-  Breadcrumbs, PageHeader, Pager, Thumb, fmtDate, inputCls, ghostBtn, primaryBtn,
+  Breadcrumbs, PageHeader, Pager, Thumb, fmtDate, primaryBtn,
 } from "@/components/ui/kit";
 import ClipText from "@/components/ui/ClipText";
+import ListToolbar from "@/components/ui/ListToolbar";
+import { resolveSort, sortOptions } from "@/lib/db/sort";
+import { buildHref } from "@/lib/list-params";
 
 type SP = Record<string, string | undefined>;
+const DEFAULT_SORT = "name_asc";
+const int = (v?: string) => (v && /^\d{1,9}$/.test(v) ? Number(v) : undefined);
+
 
 export default async function CountriesPage({ searchParams }: { searchParams: Promise<SP> }) {
   const sp = await searchParams;
   const historical = sp.historical === "yes" || sp.historical === "no" ? sp.historical : undefined;
+  const { key: sort } = resolveSort(sp.sort, COUNTRY_SORTS, DEFAULT_SORT);
   const { rows, total, pageSize, page } = await listCountries({
-    q: sp.q, historical, page: sp.page ? Number(sp.page) : 1,
+    q: sp.q, historical, sort, page: int(sp.page) ?? 1,
   });
   const pages = Math.max(1, Math.ceil(total / pageSize));
 
-  const href = (p: number) => {
-    const u = new URLSearchParams();
-    if (sp.q) u.set("q", sp.q);
-    if (historical) u.set("historical", historical);
-    if (p > 1) u.set("page", String(p));
-    const s = u.toString();
-    return s ? `/countries?${s}` : "/countries";
-  };
+  const href = (p: number) => buildHref("/countries", {
+    q: sp.q, historical, sort: sort === DEFAULT_SORT ? undefined : sort, page: p > 1 ? p : undefined,
+  });
 
   const tableRows = rows.map((c) => ({
     id: c.id,
@@ -51,19 +53,13 @@ export default async function CountriesPage({ searchParams }: { searchParams: Pr
       />
 
       <section className="rounded-xl border border-neutral-200 bg-[#fbfaf6]">
-        <form method="get" className="flex flex-wrap gap-2 border-b border-neutral-200 p-4">
-          <input name="q" defaultValue={sp.q} placeholder="Search by country name…"
-            className={`${inputCls} min-w-56 flex-1`} />
-          <select name="historical" defaultValue={historical ?? ""} className={`${inputCls} w-auto`}>
-            <option value="">Type: All</option>
-            <option value="no">Current</option>
-            <option value="yes">Historical</option>
-          </select>
-          <button className={ghostBtn}>Apply</button>
-          {(sp.q || historical) && (
-            <Link href="/countries" className="px-2 py-2 text-sm text-neutral-500 underline">Clear</Link>
-          )}
-        </form>
+        <ListToolbar
+          basePath="/countries" searchPlaceholder="Search countries by name…"
+          sortOptions={sortOptions(COUNTRY_SORTS)} defaultSort={DEFAULT_SORT} total={total}
+          fields={[
+            { kind: "select", name: "historical", label: "Type", options: [{ value: "no", label: "Current" }, { value: "yes", label: "Historical" }] },
+          ]}
+        />
 
         <RecordTable
           basePath="/countries"

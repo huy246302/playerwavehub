@@ -1,5 +1,6 @@
 import "server-only";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { by, resolveSort, type SortMap } from "@/lib/db/sort";
 import { fail, one, PAGE_SIZE } from "@/lib/db/util";
 
 type CountryRef = { id: number; name: string } | null;
@@ -15,18 +16,33 @@ export type FederationRow = {
 const COLS =
   "id, slug, name, short_name, confederation, founded_year, ended_year, logo_url, created_at, updated_at, country:countries(id, name)";
 
+export const FEDERATION_SORTS: SortMap = {
+  created_desc: by("Newest added", ["created_at", "desc"], ["id", "desc"]),
+  created_asc: by("Oldest added", ["created_at", "asc"], ["id", "asc"]),
+  updated_desc: by("Recently updated", ["updated_at", "desc"], ["id", "desc"]),
+  name_asc: by("Name A–Z", ["name", "asc"], ["id", "asc"]),
+  name_desc: by("Name Z–A", ["name", "desc"], ["id", "desc"]),
+  founded_asc: by("Founded: earliest first", ["founded_year", "asc"], ["name", "asc"]),
+  founded_desc: by("Founded: latest first", ["founded_year", "desc"], ["name", "asc"]),
+};
+
 export async function listFederations(f: {
   q?: string; countryId?: number; status?: FederationStatus; page?: number;
+  confederation?: string; foundedFrom?: number; foundedTo?: number; sort?: string;
 }) {
   const sb = createAdminClient();
   const page = f.page && f.page > 0 ? f.page : 1;
 
+  const { order } = resolveSort(f.sort, FEDERATION_SORTS, "name_asc");
   let q = sb.from("federations").select(COLS, { count: "exact" })
-    .order("name")
     .range((page - 1) * PAGE_SIZE, page * PAGE_SIZE - 1);
+  for (const o of order) q = q.order(o.column, { ascending: o.ascending, nullsFirst: false });
 
   if (f.q) q = q.ilike("name", `%${f.q}%`);
   if (f.countryId) q = q.eq("country_id", f.countryId);
+  if (f.confederation) q = q.eq("confederation", f.confederation);
+  if (f.foundedFrom) q = q.gte("founded_year", f.foundedFrom);
+  if (f.foundedTo) q = q.lte("founded_year", f.foundedTo);
   if (f.status === "active") q = q.is("ended_year", null);
   if (f.status === "defunct") q = q.not("ended_year", "is", null);
 

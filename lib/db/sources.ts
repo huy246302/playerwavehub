@@ -1,5 +1,6 @@
 import "server-only";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { by, resolveSort, type SortMap } from "@/lib/db/sort";
 import { fail, PAGE_SIZE } from "@/lib/db/util";
 
 export type Source = {
@@ -7,15 +8,32 @@ export type Source = {
   published_on: string | null; accessed_on: string | null; notes: string | null; created_at: string;
 };
 
-export async function listSources(f: { q?: string; page?: number }) {
+export const SOURCE_SORTS: SortMap = {
+  created_desc: by("Newest added", ["created_at", "desc"], ["id", "desc"]),
+  created_asc: by("Oldest added", ["created_at", "asc"], ["id", "asc"]),
+  title_asc: by("Title A–Z", ["title", "asc"], ["id", "asc"]),
+  title_desc: by("Title Z–A", ["title", "desc"], ["id", "desc"]),
+  published_desc: by("Published: newest first", ["published_on", "desc"], ["id", "desc"]),
+  published_asc: by("Published: oldest first", ["published_on", "asc"], ["id", "asc"]),
+};
+
+export async function listSources(f: {
+  q?: string; page?: number; publisher?: string; fromYear?: number; toYear?: number; sort?: string;
+}) {
   const sb = createAdminClient();
   const page = f.page && f.page > 0 ? f.page : 1;
 
+  const { order } = resolveSort(f.sort, SOURCE_SORTS, "created_desc");
   let q = sb.from("sources").select("*", { count: "exact" })
-    .order("created_at", { ascending: false })
     .range((page - 1) * PAGE_SIZE, page * PAGE_SIZE - 1);
+  for (const o of order) q = q.order(o.column, { ascending: o.ascending, nullsFirst: false });
 
-  if (f.q) q = q.or(`title.ilike.%${f.q}%,publisher.ilike.%${f.q}%,author.ilike.%${f.q}%`);
+  const term = f.q?.replace(/[,()%*\\]/g, " ").trim();
+  if (term) q = q.or(`title.ilike.%${term}%,publisher.ilike.%${term}%,author.ilike.%${term}%`);
+  const publisher = f.publisher?.replace(/[%*\\]/g, " ").trim();
+  if (publisher) q = q.ilike("publisher", `%${publisher}%`);
+  if (f.fromYear) q = q.gte("published_on", `${f.fromYear}-01-01`);
+  if (f.toYear) q = q.lte("published_on", `${f.toYear}-12-31`);
 
   const { data, count, error } = await q;
   if (error) throw fail(error);

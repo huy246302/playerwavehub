@@ -1,34 +1,36 @@
 import Link from "next/link";
-import { listNationalTeams } from "@/lib/db/national-teams";
+import { listNationalTeams, NATIONAL_TEAM_SORTS } from "@/lib/db/national-teams";
 import { listCountryOptions } from "@/lib/db/countries";
 import { deleteNationalTeams } from "@/lib/actions/national-teams";
 import RecordTable from "@/components/ui/RecordTable";
 import {
-  Breadcrumbs, PageHeader, Pager, Thumb, fmtDate, inputCls, ghostBtn, primaryBtn,
+  Breadcrumbs, PageHeader, Pager, Thumb, fmtDate, primaryBtn,
 } from "@/components/ui/kit";
 import { clip } from "@/lib/names";
 import ClipText from "@/components/ui/ClipText";
+import ListToolbar from "@/components/ui/ListToolbar";
+import { resolveSort, sortOptions } from "@/lib/db/sort";
+import { buildHref } from "@/lib/list-params";
 
 type SP = Record<string, string | undefined>;
+const DEFAULT_SORT = "name_asc";
+const int = (v?: string) => (v && /^\d{1,9}$/.test(v) ? Number(v) : undefined);
+
 
 export default async function NationalTeamsPage({ searchParams }: { searchParams: Promise<SP> }) {
   const sp = await searchParams;
-  const countryId = sp.country ? Number(sp.country) : undefined;
+  const countryId = int(sp.country);
+  const { key: sort } = resolveSort(sp.sort, NATIONAL_TEAM_SORTS, DEFAULT_SORT);
 
   const [{ rows, total, pageSize, page }, countries] = await Promise.all([
-    listNationalTeams({ q: sp.q, countryId, page: sp.page ? Number(sp.page) : 1 }),
+    listNationalTeams({ q: sp.q, countryId, sort, page: int(sp.page) ?? 1 }),
     listCountryOptions(),
   ]);
   const pages = Math.max(1, Math.ceil(total / pageSize));
 
-  const href = (p: number) => {
-    const u = new URLSearchParams();
-    if (sp.q) u.set("q", sp.q);
-    if (countryId) u.set("country", String(countryId));
-    if (p > 1) u.set("page", String(p));
-    const s = u.toString();
-    return s ? `/national-teams?${s}` : "/national-teams";
-  };
+  const href = (p: number) => buildHref("/national-teams", {
+    q: sp.q, country: countryId, sort: sort === DEFAULT_SORT ? undefined : sort, page: p > 1 ? p : undefined,
+  });
 
   const tableRows = rows.map((t) => ({
     id: t.id,
@@ -52,15 +54,13 @@ export default async function NationalTeamsPage({ searchParams }: { searchParams
       />
 
       <section className="rounded-xl border border-neutral-200 bg-[#fbfaf6]">
-        <form method="get" className="flex flex-wrap gap-2 border-b border-neutral-200 p-4">
-          <input name="q" defaultValue={sp.q} placeholder="Search by team name…" className={`${inputCls} min-w-56 flex-1`} />
-          <select name="country" defaultValue={countryId ? String(countryId) : ""} className={`${inputCls} w-auto`}>
-            <option value="">Country: All</option>
-            {countries.map((c) => <option key={c.id} value={c.id} title={c.name}>{clip(c.name)}</option>)}
-          </select>
-          <button className={ghostBtn}>Apply</button>
-          {(sp.q || countryId) && <Link href="/national-teams" className="px-2 py-2 text-sm text-neutral-500 underline">Clear</Link>}
-        </form>
+        <ListToolbar
+          basePath="/national-teams" searchPlaceholder="Search national teams by name…"
+          sortOptions={sortOptions(NATIONAL_TEAM_SORTS)} defaultSort={DEFAULT_SORT} total={total}
+          fields={[
+            { kind: "select", name: "country", label: "Country", options: countries.map((c) => ({ value: String(c.id), label: clip(c.name) })) },
+          ]}
+        />
 
         <RecordTable
           basePath="/national-teams"
