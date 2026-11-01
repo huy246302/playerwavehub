@@ -107,20 +107,7 @@ export function Thumb({ src, className }: { src?: string | null; className?: str
   return <img src={src} alt="" className={className} />;
 }
 
-export function Pager({
-  total, page, pages, href,
-}: { total: number; page: number; pages: number; href: (p: number) => string }) {
-  return (
-    <div className="flex items-center justify-between border-t border-neutral-200 px-4 py-3 text-sm text-neutral-500">
-      <span>{total} records</span>
-      <div className="flex items-center gap-3">
-        <span>Page {page} of {pages}</span>
-        {page > 1 && <Link href={href(page - 1)}>‹ Prev</Link>}
-        {page < pages && <Link href={href(page + 1)}>Next ›</Link>}
-      </div>
-    </div>
-  );
-}
+export { default as Pager } from "@/components/ui/Pager";
 
 // digits only, max length, optional upper bound — used on any plain-integer input
 export function clampDigits(maxLen: number, max?: number) {
