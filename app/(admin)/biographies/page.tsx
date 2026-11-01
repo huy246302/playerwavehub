@@ -5,6 +5,7 @@ import RecordTable from "@/components/ui/RecordTable";
 import {
   Breadcrumbs, PageHeader, Pager, fmtDate, inputCls, ghostBtn, primaryBtn,
 } from "@/components/ui/kit";
+import Avatar from "@/components/ui/Avatar";
 
 export const metadata = { title: "Biographies" };
 
@@ -30,12 +31,12 @@ export default async function BiographiesPage({ searchParams }: { searchParams: 
   const tableRows = rows.map((b) => ({
     id: b.id,
     cells: [
-      <Link key="n" href={`/biographies/${b.id}`} className="font-medium hover:underline">
+      <Link key="n" href={`/biographies/${b.id}`} className="flex items-center gap-3 font-medium hover:underline"><Avatar src={b.photo_url} /><span className="min-w-0">
         {b.full_name}
         {b.display_name && b.display_name !== b.full_name && (
           <span className="ml-2 text-xs font-normal text-neutral-500">{b.display_name}</span>
         )}
-      </Link>,
+      </span></Link>,
       <span key="r" className="flex gap-1.5">
         {b.player && <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs text-green-800">Player</span>}
         {b.coach && <span className="rounded-full bg-sky-100 px-2 py-0.5 text-xs text-sky-800">Head coach</span>}

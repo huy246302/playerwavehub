@@ -5,8 +5,9 @@ import { deletePlayers } from "@/lib/actions/players";
 import DeleteRecordButton from "@/components/ui/DeleteRecordButton";
 import { DetailTabs } from "@/components/ui/DetailTabs";
 import NationalityTag from "@/components/ui/NationalityTag";
-import { Breadcrumbs, Card, DefList, PageHeader, fmtDateTime, primaryBtn } from "@/components/ui/kit";
+import { Breadcrumbs, Card, DefList, fmtDateTime, primaryBtn } from "@/components/ui/kit";
 import { displayName } from "@/lib/names";
+import PersonHeader from "@/components/ui/PersonHeader";
 
 const TABS = [
   { key: "overview", label: "Overview" },
@@ -28,7 +29,7 @@ export default async function PlayerPage({ params }: { params: Promise<{ id: str
   return (
     <div className="space-y-6">
       <Breadcrumbs items={[{ label: "Archive", href: "/" }, { label: "Players", href: "/players" }, { label: displayName(player.person, `Player #${player.id}`) }]} />
-      <PageHeader
+      <PersonHeader photoUrl={player.person?.photo_url}
         title={displayName(player.person, `Player #${player.id}`)}
         description={`Player #${player.id} · Linked Biography #${player.biography_id}`}
         actions={

@@ -4,8 +4,8 @@ import { getBiography } from "@/lib/db/biographies";
 import { deleteBiography } from "@/lib/actions/biographies";
 import DeleteRecordButton from "@/components/ui/DeleteRecordButton";
 import {
-  Breadcrumbs, Card, DefList, PageHeader, Thumb, fmtDate, fmtDateTime, primaryBtn,
-} from "@/components/ui/kit";
+  Breadcrumbs, Card, DefList, Thumb, fmtDate, fmtDateTime, primaryBtn } from "@/components/ui/kit";
+import PersonHeader from "@/components/ui/PersonHeader";
 
 export default async function BiographyPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -23,7 +23,7 @@ export default async function BiographyPage({ params }: { params: Promise<{ id: 
         { label: "Biographies", href: "/biographies" },
         { label: name },
       ]} />
-      <PageHeader
+      <PersonHeader photoUrl={b.photo_url}
         title={name}
         description={`Biography · Record #${b.id}`}
         actions={

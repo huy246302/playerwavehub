@@ -10,6 +10,7 @@ const first = <T,>(v: T | T[] | null | undefined): T | null =>
   Array.isArray(v) ? v[0] ?? null : v ?? null;
 
 export type BiographyListRow = {
+  photo_url: string | null;
   id: number;
   full_name: string;
   display_name: string | null;
@@ -54,7 +55,7 @@ export async function listBiographies({
 
   // !inner turns the embed into an inner join, which filters the parent rows by role
   const columns =
-    "id, full_name, display_name, date_of_birth, date_of_death, birthplace, created_at, " +
+    "id, full_name, display_name, photo_url, date_of_birth, date_of_death, birthplace, created_at, " +
     `players${role === "player" ? "!inner" : ""}(id, is_published), ` +
     `coaches${role === "coach" ? "!inner" : ""}(id, is_published)`;
 

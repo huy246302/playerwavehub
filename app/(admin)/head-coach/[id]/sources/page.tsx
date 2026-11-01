@@ -5,8 +5,9 @@ import { listSourceOptions } from "@/lib/db/sources";
 import { linkBiographySource, unlinkBiographySource } from "@/lib/actions/biography-sources";
 import SourceLinker from "@/components/sources/SourceLinker";
 import { DetailTabs } from "@/components/ui/DetailTabs";
-import { Breadcrumbs, PageHeader } from "@/components/ui/kit";
+import { Breadcrumbs } from "@/components/ui/kit";
 import { displayName } from "@/lib/names";
+import PersonHeader from "@/components/ui/PersonHeader";
 
 const TABS = [
   { key: "overview", label: "Overview" }, { key: "attributes", label: "Attributes" },
@@ -33,7 +34,7 @@ export default async function CoachSourcesPage({ params }: { params: Promise<{ i
         { label: "Archive", href: "/" }, { label: "Head coaches", href: "/head-coach" },
         { label: displayName(coach.person, `Coach #${coach.id}`), href: basePath }, { label: "Sources" },
       ]} />
-      <PageHeader title="Sources" description={`Evidence linked through Biography #${coach.biography_id}.`} />
+      <PersonHeader photoUrl={coach.person?.photo_url} title="Sources" description={`Evidence linked through Biography #${coach.biography_id}.`} />
       <DetailTabs basePath={basePath} current="sources" tabs={TABS} />
       <SourceLinker
         title="Biography sources"

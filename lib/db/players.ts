@@ -8,7 +8,7 @@ export type Nationality = {
 } | null;
 
 type Person = {
-  id: number; full_name: string; display_name: string | null; nationality: Nationality;
+  id: number; full_name: string; display_name: string | null; photo_url: string | null; nationality: Nationality;
 } | null;
 
 export type PlayerRow = {
@@ -37,7 +37,7 @@ export const PLAYER_SORTS: SortMap = {
 const NATIONALITY = "nationality:countries!nationality_id(id, name, demonym, is_historical)";
 
 const COLS =
-  `id, biography_id, height_cm, legacy_summary, career_start_year, retired_year, is_published, updated_at, updated_by, person:biographies!inner(id, full_name, display_name, sort_name, ${NATIONALITY})`;
+  `id, biography_id, height_cm, legacy_summary, career_start_year, retired_year, is_published, updated_at, updated_by, person:biographies!inner(id, full_name, display_name, sort_name, photo_url, ${NATIONALITY})`;
 
 const first = <T,>(v: T | T[] | null | undefined): T | null =>
   Array.isArray(v) ? v[0] ?? null : v ?? null;
@@ -99,7 +99,7 @@ export async function statusCounts() {
 export async function getPlayer(id: number) {
   const sb = createAdminClient();
   const { data, error } = await sb.from("players")
-    .select(`*, person:biographies(id, full_name, display_name, ${NATIONALITY})`)
+    .select(`*, person:biographies(id, full_name, display_name, photo_url, ${NATIONALITY})`)
     .eq("id", id).maybeSingle();
   if (error) throw fail(error);
   if (!data) return null;

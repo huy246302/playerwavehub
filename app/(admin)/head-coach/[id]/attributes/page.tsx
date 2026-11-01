@@ -3,8 +3,9 @@ import { getCoach } from "@/lib/db/coach";
 import { getCoachAttributes } from "@/lib/db/coach-attributes";
 import CoachAttributesForm from "@/components/coaches/AttributesForm";
 import { DetailTabs } from "@/components/ui/DetailTabs";
-import { Breadcrumbs, PageHeader } from "@/components/ui/kit";
+import { Breadcrumbs } from "@/components/ui/kit";
 import { displayName } from "@/lib/names";
+import PersonHeader from "@/components/ui/PersonHeader";
 
 const TABS = [
   { key: "overview", label: "Overview" }, { key: "attributes", label: "Attributes" },
@@ -26,7 +27,7 @@ export default async function CoachAttributesPage({ params }: { params: Promise<
         { label: "Archive", href: "/" }, { label: "Head coaches", href: "/head-coach" },
         { label: displayName(coach.person, `Coach #${coach.id}`), href: basePath }, { label: "Attributes" },
       ]} />
-      <PageHeader title="Coach attributes" description="Coaching, mental and management ratings, 1–100." />
+      <PersonHeader photoUrl={coach.person?.photo_url} title="Coach attributes" description="Coaching, mental and management ratings, 1–100." />
       <DetailTabs basePath={basePath} current="attributes" tabs={TABS} />
       <CoachAttributesForm coachId={coach.id} attributes={attrs} backHref={basePath} />
     </div>

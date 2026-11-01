@@ -7,6 +7,7 @@ import { Breadcrumbs, PageHeader, Pager, fmtDate, primaryBtn } from "@/component
 import { clip, displayName, fullNameIfDifferent } from "@/lib/names";
 import ListToolbar from "@/components/ui/ListToolbar";
 import { resolveSort, sortOptions } from "@/lib/db/sort";
+import Avatar from "@/components/ui/Avatar";
 
 type SP = Record<string, string | undefined>;
 const DEFAULT_SORT = "updated_desc";
@@ -44,9 +45,9 @@ export default async function HeadCoachPage({ searchParams }: { searchParams: Pr
   const tableRows = rows.map((r) => ({
     id: r.id,
     cells: [
-      <Link key="n" href={`/head-coach/${r.id}`} className="block hover:underline">
+      <Link key="n" href={`/head-coach/${r.id}`} className="flex items-center gap-3 hover:underline"><Avatar src={r.person?.photo_url} /><span className="block min-w-0">
         <span className="font-medium">{displayName(r.person)}</span>
-        <br /><span className="text-xs text-neutral-400">{clip(fullNameIfDifferent(r.person) ?? `Biography #${r.person?.id ?? "—"}`, 40)}</span>
+        <br /><span className="text-xs text-neutral-400">{clip(fullNameIfDifferent(r.person) ?? `Biography #${r.person?.id ?? "—"}`, 40)}</span></span>
       </Link>,
       <span key="nat" className="text-neutral-600">
         <NationalityTag nationality={r.person?.nationality} />

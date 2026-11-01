@@ -6,9 +6,10 @@ import { getPlayerFeet } from "@/lib/db/player-feet";
 import AttributesForm from "@/components/players/AttributesForm";
 import PositionsFeetCard from "@/components/players/PositionsFeetCard";
 import { DetailTabs } from "@/components/ui/DetailTabs";
-import { Breadcrumbs, PageHeader } from "@/components/ui/kit";
+import { Breadcrumbs } from "@/components/ui/kit";
 import { playerKindFromPrimary } from "@/lib/validation/player-attributes";
 import { displayName } from "@/lib/names";
+import PersonHeader from "@/components/ui/PersonHeader";
 
 const TABS = [
   { key: "overview", label: "Overview" }, { key: "attributes", label: "Attributes" },
@@ -33,7 +34,7 @@ export default async function PlayerAttributesPage({ params }: { params: Promise
         { label: "Archive", href: "/" }, { label: "Players", href: "/players" },
         { label: displayName(player.person, `Player #${player.id}`), href: basePath }, { label: "Attributes" },
       ]} />
-      <PageHeader title="Player attributes" description="Technical, mental, physical, goalkeeping ratings, positions and foot." />
+      <PersonHeader photoUrl={player.person?.photo_url} title="Player attributes" description="Technical, mental, physical, goalkeeping ratings, positions and foot." />
       <DetailTabs basePath={basePath} current="attributes" tabs={TABS} />
       <PositionsFeetCard playerId={player.id} positions={positions} feet={feet} />
       <AttributesForm playerId={player.id} attributes={attrs} backHref={basePath} kind={kind} />

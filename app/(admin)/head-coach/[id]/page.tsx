@@ -5,8 +5,9 @@ import { deleteCoaches } from "@/lib/actions/coach";
 import DeleteRecordButton from "@/components/ui/DeleteRecordButton";
 import { DetailTabs } from "@/components/ui/DetailTabs";
 import NationalityTag from "@/components/ui/NationalityTag";
-import { Breadcrumbs, Card, DefList, PageHeader, fmtDateTime, primaryBtn } from "@/components/ui/kit";
+import { Breadcrumbs, Card, DefList, fmtDateTime, primaryBtn } from "@/components/ui/kit";
 import { displayName } from "@/lib/names";
+import PersonHeader from "@/components/ui/PersonHeader";
 
 const TABS = [
   { key: "overview", label: "Overview" }, { key: "attributes", label: "Attributes" },
@@ -26,7 +27,7 @@ export default async function CoachPage({ params }: { params: Promise<{ id: stri
   return (
     <div className="space-y-6">
       <Breadcrumbs items={[{ label: "Archive", href: "/" }, { label: "Head coaches", href: "/head-coach" }, { label: displayName(coach.person, `Coach #${coach.id}`) }]} />
-      <PageHeader
+      <PersonHeader photoUrl={coach.person?.photo_url}
         title={displayName(coach.person, `Coach #${coach.id}`)}
         description={`Coach #${coach.id} · Linked Biography #${coach.biography_id}`}
         actions={
