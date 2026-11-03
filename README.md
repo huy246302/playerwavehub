@@ -64,6 +64,14 @@ playerwavehub
 │  │  │     ├─ edit
 │  │  │     │  └─ page.tsx
 │  │  │     └─ page.tsx
+│  │  ├─ federations
+│  │  │  ├─ new
+│  │  │  │  └─ page.tsx
+│  │  │  ├─ page.tsx
+│  │  │  └─ [id]
+│  │  │     ├─ edit
+│  │  │     │  └─ page.tsx
+│  │  │     └─ page.tsx
 │  │  ├─ head-coach
 │  │  │  ├─ new
 │  │  │  │  └─ page.tsx
@@ -137,12 +145,17 @@ playerwavehub
 │  │     └─ NationalStintsCard.tsx
 │  ├─ countries
 │  │  └─ CountryForm.tsx
+│  ├─ federations
+│  │  └─ FederationForm.tsx
 │  ├─ national-teams
 │  │  └─ NationalTeamForm.tsx
 │  ├─ players
 │  │  ├─ AttributesForm.tsx
+│  │  ├─ FootCard.tsx
 │  │  ├─ HiddenAttributesForm.tsx
+│  │  ├─ PitchMap.tsx
 │  │  ├─ PlayerForm.tsx
+│  │  ├─ PositionsCard.tsx
 │  │  ├─ PositionsFeetCard.tsx
 │  │  └─ stints
 │  │     ├─ ClubStintsCard.tsx
@@ -153,11 +166,17 @@ playerwavehub
 │  │  ├─ SourceForm.tsx
 │  │  └─ SourceLinker.tsx
 │  └─ ui
+│     ├─ Avatar.tsx
+│     ├─ ClipText.tsx
 │     ├─ DateInput.tsx
 │     ├─ DeleteRecordButton.tsx
 │     ├─ DetailTabs.tsx
 │     ├─ kit.tsx
+│     ├─ ListToolbar.tsx
 │     ├─ NationalityTag.tsx
+│     ├─ PageJump.tsx
+│     ├─ Pager.tsx
+│     ├─ PersonHeader.tsx
 │     └─ RecordTable.tsx
 ├─ eslint.config.mjs
 ├─ lib
@@ -170,8 +189,10 @@ playerwavehub
 │  │  ├─ coach-stints.ts
 │  │  ├─ coach.ts
 │  │  ├─ countries.ts
+│  │  ├─ federations.ts
 │  │  ├─ national-teams.ts
 │  │  ├─ player-attributes.ts
+│  │  ├─ player-feet.ts
 │  │  ├─ player-hidden-attributes.ts
 │  │  ├─ player-positions.ts
 │  │  ├─ player-stints.ts
@@ -189,6 +210,7 @@ playerwavehub
 │  │  ├─ coach.ts
 │  │  ├─ countries.ts
 │  │  ├─ counts.ts
+│  │  ├─ federations.ts
 │  │  ├─ national-teams.ts
 │  │  ├─ player-attributes.ts
 │  │  ├─ player-feet.ts
@@ -196,9 +218,13 @@ playerwavehub
 │  │  ├─ player-positions.ts
 │  │  ├─ player-stints.ts
 │  │  ├─ players.ts
+│  │  ├─ sort.ts
 │  │  ├─ sources.ts
 │  │  └─ util.ts
 │  ├─ form-state.ts
+│  ├─ list-params.ts
+│  ├─ names.ts
+│  ├─ positions.ts
 │  ├─ slug.ts
 │  ├─ supabase
 │  │  ├─ admin.ts
@@ -212,6 +238,8 @@ playerwavehub
 │     ├─ coach.ts
 │     ├─ common.ts
 │     ├─ country.ts
+│     ├─ federation.ts
+│     ├─ foot.ts
 │     ├─ national-team.ts
 │     ├─ player-attributes.ts
 │     ├─ player-hidden-attributes.ts
@@ -250,7 +278,9 @@ playerwavehub
 │     ├─ 20261020180311_finish_biographies_rename.sql
 │     ├─ 20261023161202_restrict_biography_delete.sql
 │     ├─ 20261027000000_country_demonym.sql
-│     └─ 20261031120000_add_federations_and_lifespans.sql
+│     ├─ 20261031120000_add_federations_and_lifespans.sql
+│     ├─ 20261101090000_foot_levels_and_position_functions.sql
+│     └─ 20261102090000_biography_sort_name.sql
 └─ tsconfig.json
 
 ```
