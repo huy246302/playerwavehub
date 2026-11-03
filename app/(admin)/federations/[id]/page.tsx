@@ -53,9 +53,9 @@ export default async function FederationPage({ params }: { params: Promise<{ id:
           </Card>
           <Card title="Logo">
             {federation.logo_url ? (
-              <div className="flex items-center gap-4">
-                <Thumb src={federation.logo_url} className="h-16 w-16 rounded-full border border-neutral-200 object-cover" />
-                <div className="text-xs text-neutral-500">
+              <div className="flex flex-col items-center gap-4 py-2">
+                <Thumb src={federation.logo_url} className="h-28 w-28 object-contain" />
+                <div className="w-full text-center text-xs text-neutral-500">
                   {federation.logo_credit && <div>Credit: {federation.logo_credit}</div>}
                   {federation.logo_license && <div>License: {federation.logo_license}</div>}
                   {federation.logo_source_url && <div className="break-all">Source: {federation.logo_source_url}</div>}

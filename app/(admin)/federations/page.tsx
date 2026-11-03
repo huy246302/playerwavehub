@@ -54,7 +54,11 @@ export default async function FederationsPage({ searchParams }: { searchParams: 
     id: f.id,
     cells: [
       <Link key="n" href={`/federations/${f.id}`} className="flex items-center gap-2 font-medium hover:underline">
-        <Thumb src={f.logo_url} className="h-6 w-6 rounded-full border border-neutral-200 object-cover" />
+        {f.logo_url ? (
+          <Thumb src={f.logo_url} className="h-8 w-8 shrink-0 object-contain" />
+        ) : (
+          <span className="h-8 w-8 shrink-0 rounded-full bg-neutral-100" aria-hidden />
+        )}
         <span>{f.name}{f.short_name && <span className="ml-1 text-neutral-400">({f.short_name})</span>}</span>
       </Link>,
       <span key="co" className="text-neutral-600">{f.country ? <ClipText text={f.country.name} /> : "—"}</span>,

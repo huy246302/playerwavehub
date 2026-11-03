@@ -40,13 +40,15 @@ export default async function NationalTeamPage({ params }: { params: Promise<{ i
               ["Slug", team.slug],
             ]} />
           </Card>
-          <Card title="Crest">
-            {team.crest_url ? (
-              <Thumb src={team.crest_url} className="h-16 w-16 rounded-full border border-neutral-200 object-cover" />
-            ) : (
-              <p className="text-sm text-neutral-500">No crest yet. Add one from Edit national team.</p>
-            )}
-          </Card>
+        <Card title="Crest">
+          {team.crest_url ? (
+            <div className="flex justify-center py-2">
+              <Thumb src={team.crest_url} className="h-28 w-28 object-contain" />
+            </div>
+          ) : (
+            <p className="text-sm text-neutral-500">No crest yet. Add one from Edit national team.</p>
+          )}
+        </Card>
           {team.description && (
             <Card title="Description">
               <p className="whitespace-pre-wrap text-sm text-neutral-700">{team.description}</p>

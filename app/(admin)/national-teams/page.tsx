@@ -36,7 +36,11 @@ export default async function NationalTeamsPage({ searchParams }: { searchParams
     id: t.id,
     cells: [
       <Link key="n" href={`/national-teams/${t.id}`} className="flex items-center gap-2 font-medium hover:underline">
-        <Thumb src={t.crest_url} className="h-6 w-6 rounded-full border border-neutral-200 object-cover" />
+        {t.crest_url ? (
+          <Thumb src={t.crest_url} className="h-8 w-8 shrink-0 object-contain" />
+        ) : (
+          <span className="h-8 w-8 shrink-0 rounded-full bg-neutral-100" aria-hidden />
+        )}
         {t.name}
       </Link>,
       <span key="co" className="text-neutral-600">{t.country ? <ClipText text={t.country.name} /> : "—"}</span>,
