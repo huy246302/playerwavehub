@@ -30,11 +30,6 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
 svg {
   display: block;
 }
@@ -1223,4 +1218,12 @@ svg {
     color: inherit;
     text-decoration: none;
   }
+}
+
+a[href$="/edit"] {
+  background-color: #2563eb;
+  color: #fff;
+}
+a[href$="/edit"]:hover {
+  background-color: #1d4ed8;
 }

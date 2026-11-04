@@ -17,7 +17,7 @@ export default function DeleteRecordButton({
     <button
       type="button"
       disabled={pending}
-      className="inline-flex items-center rounded-md border border-red-200 px-4 py-2 text-sm text-red-700 hover:bg-red-50 disabled:opacity-50"
+      className="inline-flex items-center rounded-md border border-red-300 bg-red-50 px-4 py-2 text-sm font-medium text-red-700 hover:bg-red-100 disabled:opacity-50"
       onClick={() => {
         if (!confirm(`Delete ${noun} "${name}"? This cannot be undone.`)) return;
         start(async () => {

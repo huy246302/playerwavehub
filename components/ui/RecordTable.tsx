@@ -53,10 +53,12 @@ export default function RecordTable({
           <button className={btn} disabled={one === null} onClick={() => one && router.push(`${basePath}/${one}`)}>
             View details
           </button>
-          <button className={btn} disabled={one === null} onClick={() => one && router.push(`${basePath}/${one}/edit`)}>
+          <button className={`${btn} border-blue-300 bg-blue-50 text-blue-700 enabled:hover:bg-blue-100`}
+            disabled={one === null} onClick={() => one && router.push(`${basePath}/${one}/edit`)}>
             Edit
           </button>
-          <button className={`${btn} border-red-200 text-red-700`} disabled={!valid.length || pending} onClick={remove}>
+          <button className={`${btn} border-red-300 bg-red-50 text-red-700 enabled:hover:bg-red-100`}
+            disabled={!valid.length || pending} onClick={remove}>
             {pending ? "Deleting…" : "Delete"}
           </button>
         </div>
